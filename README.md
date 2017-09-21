@@ -1,5 +1,5 @@
 ---
-title: "editData : An RStudio Addin for Editing A 'data.frame'"
+title: "editData : An RStudio Addin for Editing a 'data.frame'"
 author: "Keon-Woong Moon"
 date: "2017-09-22"
 output: rmarkdown::html_vignette
