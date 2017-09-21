@@ -7,9 +7,9 @@
 editData(data = NULL, viewer = "dialog")
 }
 \arguments{
-\item{viewer}{Specify where the gadget should be displayed. Possible choices are c("dialog","browser","pane")}
+\item{data}{A tibble or a tbl_df or a data.frame to manipulate}
 
-\item{df}{A tibble or a tbl_df or a data.frame to manipulate}
+\item{viewer}{Specify where the gadget should be displayed. Possible choices are c("dialog","browser","pane")}
 }
 \value{
 A manipulated 'data.frame' or NULL

@@ -1,3 +1,19 @@
+#' Sample Data for testing 'editData' addin
+#'
+#' A sample dataset containing data for 4 people
+#'
+#' @format A data.frame with 4 rows and 6 variables:
+#' \describe{
+#' \item{name}{Last name}
+#' \item{age}{age in years}
+#' \item{country}{Country Name}
+#' \item{sex}{sex, A factor with two levels.}
+#' \item{bloodType}{Blood Type. A factor with four levels}
+#' \item{date}{Date}
+#' }
+"sampleData"
+
+
 #' Create a side-by-side textInput control for entry of unstructured text values
 #'
 #'@param inputId The input slot that will be used to access the value.

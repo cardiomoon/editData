@@ -1,0 +1,4 @@
+Name: editData
+Description: Editing A 'data.frame'
+Binding: editData
+Interactive: true

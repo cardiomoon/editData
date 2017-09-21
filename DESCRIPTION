@@ -1,17 +1,24 @@
 Package: editData
 Type: Package
-Title: RStudio Addin for Edit A 'data.frame'
+Title: RStudio Addin for Editing A 'data.frame'
+Version: 0.1.0
 Imports:
     shiny (>= 0.13),
     miniUI (>= 0.1.1),
     rstudioapi (>= 0.5),
-    DT
+    DT,
+    tibble
 Authors@R: person("Keon-Woong", "Moon", email = "cardiomoon@gmail.com",
                   role = c("aut", "cre"))
-Description: An RStudio addin for editing a 'data.frame'. You can delete, add or update a 'data.frame' without coding. 
-    You can get resultant data (as a 'data.frame'). 
+Description: An RStudio addin for editing a 'data.frame'. You can delete, add or update a 'data.frame'
+    without coding. You can get resultant data (as a 'data.frame').
+URL: https://github.com/cardiomoon/editData
+BugReports: https://github.com/cardiomoon/editData/issues
 License: GPL-3
 Encoding: UTF-8
+Depends: R (>= 2.10)
 LazyData: true
 RoxygenNote: 6.0.1
+Suggests: knitr,
+    rmarkdown
 VignetteBuilder: knitr

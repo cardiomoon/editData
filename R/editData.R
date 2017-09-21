@@ -1,21 +1,18 @@
-library(shiny)
-library(DT)
-library(tibble)
-library(miniUI)
 #' A shiny app for editing a 'data.frame'
 
-#' @param df A tibble or a tbl_df or a data.frame to manipulate
+#' @param data A tibble or a tbl_df or a data.frame to manipulate
 #' @param viewer Specify where the gadget should be displayed. Possible choices are c("dialog","browser","pane")
 #'
 #' @return A manipulated 'data.frame' or NULL
-#' @importFrom shiny selectInput runGadget hr
+#' @importFrom shiny selectInput runGadget hr dateInput h4 modalButton modalDialog showModal updateDateInput
 #' @importFrom shiny textInput checkboxInput numericInput conditionalPanel verbatimTextOutput uiOutput h3 actionButton
-#' @importFrom shiny validate need updateTextInput updateCheckboxInput
+#' @importFrom shiny validate need updateTextInput updateCheckboxInput reactive
 #' @importFrom shiny updateSelectInput renderUI tagList updateNumericInput updateSelectInput
-#' @importFrom shiny observeEvent stopApp dialogViewer paneViewer browserViewer
+#' @importFrom shiny observeEvent stopApp dialogViewer paneViewer browserViewer div tags icon
 #' @importFrom rstudioapi getActiveDocumentContext
 #' @importFrom miniUI miniPage gadgetTitleBar miniContentPanel
 #' @importFrom tibble add_row
+#' @importFrom DT datatable
 #' @export
 #'
 editData=function(data=NULL,viewer="dialog"){
@@ -29,25 +26,26 @@ editData=function(data=NULL,viewer="dialog"){
 
     if(is.null(data)) {
         if(nzchar(defaultData)) {
-            data=defaultData
+            mydata=defaultData
         } else {
-            data="mtcars"
+            mydata="sampleData"
         }
     }
+
     if(any(class(data) %in% c("data.frame","tibble","tbl_df"))) {
-        mydata=deparse(substitute(data))
+         mydata=deparse(substitute(data))
     } else if(class(data) =="character") {
 
-        result<-tryCatch(eval(parse(text=data)),error=function(e) "error")
-        if(any(class(result) %in% c("data.frame","tibble","tbl_df"))) mydata=data
-        else  return(NULL)
+         result<-tryCatch(eval(parse(text=data)),error=function(e) "error")
+         if(any(class(result) %in% c("data.frame","tibble","tbl_df"))) mydata=data
+         else  return(NULL)
     }
 
 
 ui <- miniPage(
      gadgetTitleBar("editable DataTable"),
      miniContentPanel(
-     textInput("mydata","Enter data name",value=data),
+     textInput("mydata","Enter data name",value=mydata),
      actionButton("delRow","Delete",icon=icon("remove",lib="glyphicon")),
      actionButton("addRow","Add New",icon=icon("plus",lib="glyphicon")),
      actionButton("editData","Edit Data",icon=icon("wrench",lib="glyphicon")),
@@ -59,6 +57,8 @@ ui <- miniPage(
 )
 
 server <- function(input, output, session) {
+
+     deleted<-deleted1<-edited<-edited1<-added<-added1<-updated1<-updated<-c()
 
      df=reactive({
           input$reload
@@ -74,7 +74,7 @@ server <- function(input, output, session) {
           datatable(
                df(),
                selection = "single",
-               caption = "Original Data"
+               caption = input$mydata
           )
      })
 
@@ -312,7 +312,7 @@ server <- function(input, output, session) {
      })
 
 }
-if(viewer=="dialog") myviewer <- dialogViewer("ggplotAssist", width = 1000, height = 800)
+if(viewer=="dialog") myviewer <- dialogViewer("editData", width = 1000, height = 800)
 else if(viewer=="browser") myviewer <- browserViewer()
 else myviewer <- paneViewer()
 runGadget(ui, server, viewer = myviewer)
