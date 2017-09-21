@@ -1,16 +1,16 @@
 ---
-title: "editData : An RStudio Addin for Editing A 'data.frame'"
+title: "package editData : An RStudio Addin for Editing A 'data.frame'"
 author: "Keon-Woong Moon"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{editData}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,comment = NA,fig.align='center',out.width="70%")
+knitr::opts_chunk$set(echo = TRUE,comment =NA,fig.align='center',out.width="70%")
 ```
 
 
