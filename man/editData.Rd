@@ -17,3 +17,12 @@ A manipulated 'data.frame' or NULL
 \description{
 A shiny app for editing a 'data.frame'
 }
+\examples{
+library(shiny)
+library(editData)
+# Only run examples in interactive R sessions
+if (interactive()) {
+    result<-editData(mtcars)
+    result
+}
+}

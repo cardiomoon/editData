@@ -14,10 +14,17 @@
 #' @importFrom tibble add_row
 #' @importFrom DT datatable
 #' @export
-#'
+#' @examples
+#' library(shiny)
+#' library(editData)
+#'# Only run examples in interactive R sessions
+#' if (interactive()) {
+#'     result<-editData(mtcars)
+#'     result
+#' }
 editData=function(data=NULL,viewer="dialog"){
 
-
+    sampleData<-editData::sampleData
     context <- rstudioapi::getActiveDocumentContext()
 
     # Set the default data to use based on the selection.
@@ -125,6 +132,7 @@ server <- function(input, output, session) {
 
                x<-df()
                x1 <- tibble::add_row(x)
+               x1 <- as.data.frame(x1)
                rownames(x1)=c(rownames(x),nrow(x1))
 
                if(input$mydata=="added"){
@@ -143,6 +151,7 @@ server <- function(input, output, session) {
 
          x<-df()
          x1 <- tibble::add_row(x)
+         x1 <-as.data.frame(x1)
          rownames(x1)=c(rownames(x),nrow(x1))
 
          if(input$mydata=="added"){
@@ -162,10 +171,16 @@ server <- function(input, output, session) {
 
           myname=colnames(x)
           status=ifelse(tibble::has_rownames(x),1,0)
+          x<-as.data.frame(x)
           rownames(x)[ids]=input$rowname
 
           for(i in 1:ncol(x)){
-              x[ids,i]=input[[myname[i]]]
+              try(x[ids,i]<-input[[myname[i]]])
+              if("POSIXct" %in% class(x[ids,i])){
+                   tz=""
+                   if(!is.null(attr(x[ids,i],"tzone"))) tz=attr(x[ids,i],"tzone")
+                   x[ids,i]=as.POSIXct(input[[myname[i]]],tz=tz,origin="1970-01-01")
+              }
           }
           if(input$mydata=="updated"){
                updated1<<-x
@@ -179,23 +194,25 @@ server <- function(input, output, session) {
      })
 
      observeEvent(input$no,{
-         mydf=df()
+         mydf=df()[input$no,]
+         mydf=as.data.frame(mydf)
          myclass=lapply(mydf,class)
 
-         updateTextInput(session,"rowname",value=rownames(mydf)[input$no])
+         updateTextInput(session,"rowname",value=rownames(mydf)[1])
          for(i in 1:ncol(mydf)){
              myname=colnames(mydf)[i]
-             if(myclass[[i]]=="factor"){
+
+             if("factor" %in% myclass[[i]]){
                  updateSelectInput(session,myname,
-                                            choices=levels(mydf[[i]]),selected=mydf[input$no,i])
-             } else if(myclass[[i]]=="Date"){
-                 updateDateInput(session,myname,value=mydf[input$no,i])
-             } else if(myclass[[i]]=="logical"){
-                 if(is.na(mydf[input$no,i])) myvalue=FALSE
-                 else myvalue=mydf[input$no,i]
+                                            choices=levels(mydf[[i]]),selected=mydf[1,i])
+             } else if("Date" %in% myclass[[i]]){
+                 updateDateInput(session,myname,value=mydf[1,i])
+             } else if("logical" %in% myclass[[i]]){
+                 if(is.na(mydf[1,i])) myvalue=FALSE
+                 else myvalue=mydf[1,i]
                  updateCheckboxInput(session,myname,value=myvalue)
              } else { # c("numeric","integer","charater")
-                 updateTextInput(session,myname,value=mydf[input$no,i])
+                 updateTextInput(session,myname,value=mydf[1,i])
              }
          }
 
@@ -249,19 +266,20 @@ server <- function(input, output, session) {
               mylist[[7]]=textInput3("rowname","rowname",value=rownames(mydf)[input$no],width=200)
               mylist[[8]]=hr()
               addno=8
+              mydf=as.data.frame(mydf[input$no,])
               for(i in 1:ncol(mydf)){
                    myname=colnames(mydf)[i]
-                   if(myclass[[i]]=="factor"){
+                   if("factor" %in% myclass[[i]]){
                         mylist[[i+addno]]=selectInput3(myname,myname,
-                                                        choices=levels(mydf[[i]]),selected=mydf[input$no,i])
-                   } else if(myclass[[i]]=="Date"){
-                        mylist[[i+addno]]=dateInput(myname,myname,value=mydf[input$no,i])
-                   } else if(myclass[[i]]=="logical"){
-                        if(is.na(mydf[input$no,i])) myvalue=FALSE
-                        else myvalue=mydf[input$no,i]
+                                                        choices=levels(mydf[[i]]),selected=mydf[1,i])
+                   } else if("Date" %in% myclass[[i]]){
+                        mylist[[i+addno]]=dateInput(myname,myname,value=mydf[1,i])
+                   } else if("logical" %in% myclass[[i]]){
+                        if(is.na(mydf[1,i])) myvalue=FALSE
+                        else myvalue=mydf[1,i]
                         mylist[[i+addno]]=checkboxInput3(myname,myname,value=myvalue)
                    } else { # c("numeric","integer","charater")
-                        mylist[[i+addno]]=textInput3(myname,myname,value=mydf[input$no,i])
+                        mylist[[i+addno]]=textInput3(myname,myname,value=mydf[1,i])
                    }
               }
               do.call(tagList,mylist)
