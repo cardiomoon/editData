@@ -1,10 +1,10 @@
 ---
-title: "editData : An RStudio Addin for Editing a 'data.frame'"
+title: "package editData : An RStudio Addin for Editing A 'data.frame'"
 author: "Keon-Woong Moon"
 date: "2017-09-22"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{editData}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
