@@ -13,14 +13,19 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE,comment =NA,fig.align='center',out.width="70%")
 ```
 
+# editData
 
-```
-The 'editData' is an RStudio addin for editing a 'data.frame'. Many RStudio users want to edit a data.frame. With this 'editData' package, you can delete, add or update a 'data.frame' without coding. You don't have to use Microsoft excel or a csv editor any more to edit data. You can get resultant data(as a 'data.frame').
-```
+
+The 'editData' is an RStudio addin for editing a 'data.frame' or a 'tibble'. Many RStudio users want to edit a data.frame. With this 'editData' package, you can delete, add or update a 'data.frame' without coding. You don't have to use Microsoft excel or a csv editor any more to edit data. You can get resultant data as a 'tibble' or as a 'data.frame'.
 
 ## Install package
 
-You can install `editData` package from github.
+You can install `editData` package from CRAN.
+```{r,eval=FALSE}
+install.packages("editData")
+```
+
+You can install the developmental version of `editData` package from github.
 
 ```{r,eval=FALSE}
 #install.packages("devtools")
@@ -81,4 +86,4 @@ require(editData)
 result <- editData(mtcars)
 ```
 
-The resultant data.frame is assigned to the object `result`.
+The resultant 'tibble' or 'data.frame' is assigned to the object `result`.

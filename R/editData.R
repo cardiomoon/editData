@@ -7,11 +7,11 @@
 #' @importFrom shiny selectInput runGadget hr dateInput h4 modalButton modalDialog showModal updateDateInput
 #' @importFrom shiny textInput checkboxInput numericInput conditionalPanel verbatimTextOutput uiOutput h3 actionButton
 #' @importFrom shiny validate need updateTextInput updateCheckboxInput reactive
-#' @importFrom shiny updateSelectInput renderUI tagList updateNumericInput updateSelectInput
+#' @importFrom shiny updateSelectInput renderUI tagList updateNumericInput updateSelectInput fluidRow column br radioButtons
 #' @importFrom shiny observeEvent stopApp dialogViewer paneViewer browserViewer div tags icon
 #' @importFrom rstudioapi getActiveDocumentContext
 #' @importFrom miniUI miniPage gadgetTitleBar miniContentPanel
-#' @importFrom tibble add_row
+#' @importFrom tibble add_row as_tibble
 #' @importFrom DT datatable
 #' @export
 #' @examples
@@ -52,10 +52,16 @@ editData=function(data=NULL,viewer="dialog"){
 ui <- miniPage(
      gadgetTitleBar("editable DataTable"),
      miniContentPanel(
-     textInput("mydata","Enter data name",value=mydata),
+
+     fluidRow(
+          column(6,
+                 textInput("mydata","Enter data name",value=mydata),
      actionButton("delRow","Delete",icon=icon("remove",lib="glyphicon")),
      actionButton("addRow","Add New",icon=icon("plus",lib="glyphicon")),
-     actionButton("editData","Edit Data",icon=icon("wrench",lib="glyphicon")),
+     actionButton("editData","Edit Data",icon=icon("wrench",lib="glyphicon"))),
+     column(6,
+            br(),
+     radioButtons("resultAs","Resultant Data as",choices=c("tibble","data.frame"),inline=TRUE))),
      hr(),
      DT::dataTableOutput("origTable"),
      conditionalPanel(condition="true==false",
@@ -321,7 +327,13 @@ server <- function(input, output, session) {
          #     attr(result,"code") <- input$code
          #     stopApp(result)
          # }
-         stopApp(df())
+         result=df()
+         if(input$resultAs=="tibble"){
+              result<-as_tibble(result)
+         } else{
+              result<-as.data.frame(result)
+         }
+         stopApp(result)
      })
 
      observeEvent(input$cancel, {

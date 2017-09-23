@@ -22,7 +22,7 @@
 #'@param width The width of the input in pixel
 #'@param bg The color of text
 #'@param ... arguments to be passed to textInput
-#'
+#'@export
 #'@examples
 #'library(shiny)
 #'# Only run examples in interactive R sessions
@@ -49,7 +49,7 @@ textInput3<-function (inputId, label, value = "",width=100,bg=NULL,...)
 #'Create a side-by-side selectInput
 #'@param ... arguments to be passed to selectInput
 #'@param width The width of the input in pixel
-#'
+#'@export
 #'@examples
 #'library(shiny)
 #'# Only run examples in interactive R sessions
@@ -74,13 +74,14 @@ selectInput3<-function(...,width=100){
 #'@param width The width of the input in pixel
 #'@param bg The color of text
 #'@param ... arguments to be passed to label
+#'@export
 #'@examples
 #'library(shiny)
 #'# Only run examples in interactive R sessions
 #'if (interactive()) {
 #'   ui <- fluidPage(
 #'          label3("Welcome"),
-#'          checkboxInput("somevalue", "Some value", FALSE),
+#'          checkboxInput3("somevalue", "Some value", FALSE),
 #'          verbatimTextOutput("value")
 #'   )
 #'   server <- function(input, output) {
@@ -104,6 +105,20 @@ label3<-function(label,width=100,bg=NULL,...){
 #'@param step Interval to use when stepping between min and max
 #'@param width The width of the input in pixel
 #'@param ... arguments to be passed to numericInput
+#'@export
+#'@examples
+#'library(shiny)
+#'# Only run examples in interactive R sessions
+#'if (interactive()) {
+#'   ui <- fluidPage(
+#'          textInput3("id", "id", ""),
+#'          numericInput3("score","score",value=1)
+#'     )
+#'     server <- function(input, output) {
+#'
+#'     }
+#'     shinyApp(ui, server)
+#'}
 numericInput3<-function (inputId, label, value, min=NA,max=NA,step=NA,width=100,...)
 {
     div(style="display:inline-block;",
@@ -118,13 +133,14 @@ numericInput3<-function (inputId, label, value, min=NA,max=NA,step=NA,width=100,
 #'@param label Display label for the control, or NULL for no label.
 #'@param value Initial value.
 #'@param width The width of the input in pixel
+#'@export
 #'@examples
 #'library(shiny)
 #'# Only run examples in interactive R sessions
 #'if (interactive()) {
 #'   ui <- fluidPage(
 #'          label3("Welcome"),
-#'          checkboxInput("somevalue", "Some value", FALSE),
+#'          checkboxInput3("somevalue", "Some value", FALSE),
 #'          verbatimTextOutput("value")
 #'   )
 #'   server <- function(input, output) {

@@ -24,7 +24,7 @@ library(shiny)
 if (interactive()) {
   ui <- fluidPage(
          label3("Welcome"),
-         checkboxInput("somevalue", "Some value", FALSE),
+         checkboxInput3("somevalue", "Some value", FALSE),
          verbatimTextOutput("value")
   )
   server <- function(input, output) {

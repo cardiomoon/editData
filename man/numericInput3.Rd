@@ -27,3 +27,17 @@ numericInput3(inputId, label, value, min = NA, max = NA, step = NA,
 \description{
 Create a side-by-side numericInput
 }
+\examples{
+library(shiny)
+# Only run examples in interactive R sessions
+if (interactive()) {
+  ui <- fluidPage(
+         textInput3("id", "id", ""),
+         numericInput3("score","score",value=1)
+    )
+    server <- function(input, output) {
+
+    }
+    shinyApp(ui, server)
+}
+}
