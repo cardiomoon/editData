@@ -1,7 +1,7 @@
 Package: editData
 Type: Package
 Title: 'RStudio' Addin for Editing a 'data.frame'
-Version: 0.1.1
+Version: 0.1.2
 Imports:
     shiny (>= 0.13),
     miniUI (>= 0.1.1),
@@ -11,8 +11,8 @@ Imports:
 Authors@R: person("Keon-Woong", "Moon", email = "cardiomoon@gmail.com",
                   role = c("aut", "cre"))
 Description: An 'RStudio' addin for editing a 'data.frame' or a 'tibble'. You can delete, add or update a 'data.frame'
-    without coding. You can get resultant data as a 'data.frame'. In the package, modularized shiny app codes are provided. 
-    These module are intended for reuse across applications.
+    without coding. You can get resultant data as a 'data.frame'. In the package, modularized 'shiny' app codes are provided. 
+    These modules are intended for reuse across applications.
 URL: https://github.com/cardiomoon/editData
 BugReports: https://github.com/cardiomoon/editData/issues
 License: GPL-3

@@ -7,26 +7,26 @@
 #'library(shiny)
 #'# Only run examples in interactive R sessions
 #'if (interactive()) {
-#'   ui <- fluidPage(
-#'       textInput("mydata","Enter data name",value="sampleData"),
-#'       editableDTUI("table1"),
-#'       verbatimTextOutput("test"),
-#'       editableDTUI("table2"),
-#'       verbatimTextOutput("test2")
-#'   )
-#'   server <- function(input, output) {
-#'      df=callModule(editableDT,"table1",data=reactive(mydf()),inputwidth=reactive(170))
+#'ui <- fluidPage(
+#'     textInput("mydata","Enter data name",value="mtcars"),
+#'     editableDTUI("table1"),
+#'     verbatimTextOutput("test"),
+#'     editableDTUI("table2"),
+#'     verbatimTextOutput("test2")
+#')
+#'server <- function(input, output) {
+#'     df=callModule(editableDT,"table1",dataname=reactive(input$mydata),inputwidth=reactive(170))
 #'
-#'      output$test=renderPrint({
-#'         str(df())
-#'      })
+#'     output$test=renderPrint({
+#'          str(df())
+#'     })
 #'     mydf<-editData::sampleData
 #'     df2=callModule(editableDT,"table2",data=reactive(mydf))
 #'     output$test2=renderPrint({
-#'        str(df2())
+#'          str(df2())
 #'     })
-#'  }
-#'  shinyApp(ui, server)
+#'}
+#'shinyApp(ui, server)
 #'}
 editableDTUI <- function(id){
 
@@ -80,7 +80,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
 
     df=reactive({
 
-          if(dataname()!="") {
+          if(input$result!="") {
               df<-eval(parse(text=input$result))
 
 
@@ -413,7 +413,7 @@ ui<-miniPage(
     fileInput("file1","Upload CSV file"),
     checkboxInput("strAsFactor","strings As Factor",value=FALSE)),
     column(6,
-    textInput3("mydata","Or Enter data name",value="sampleData",width=150,bg="lightcyan"))),
+    textInput3("mydata","Or Enter data name",value=mydata,width=150,bg="lightcyan"))),
     editableDTUI("table1"),
     downloadButton("downloadData","Download as CSV")
     #,verbatimTextOutput("test")
