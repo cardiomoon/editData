@@ -22,6 +22,7 @@
 #'@param width The width of the input in pixel
 #'@param bg The color of text
 #'@param ... arguments to be passed to textInput
+#'@importFrom shiny div
 #'@export
 #'@examples
 #'library(shiny)
@@ -49,6 +50,7 @@ textInput3<-function (inputId, label, value = "",width=100,bg=NULL,...)
 #'Create a side-by-side selectInput
 #'@param ... arguments to be passed to selectInput
 #'@param width The width of the input in pixel
+#'@importFrom shiny selectInput
 #'@export
 #'@examples
 #'library(shiny)
@@ -161,4 +163,77 @@ checkboxInput3<-function(inputId,label,value=FALSE,width=100){
         tags$input(id = inputId, type = "checkbox"),
         tags$label(label, `for` = inputId, style=paste("width: ",width-15,"px;",sep=""))
     )
+}
+
+#'Create a side-by-side radioButtons
+#'@param inputId The input slot that will be used to access the value.
+#'@param label Display label for the control, or NULL for no label.
+#'@param choices List of values to select from
+#'@param bg The color of text
+#'@param labelwidth The width of the label in pixel
+#'@param inline If TRUE, render the choices inline (i.e. horizontally)
+#'@param align text align of label
+#'@param ... arguments to be passed to radioButtons
+#'@importFrom shiny radioButtons tags
+#'@export
+#'@examples
+#'library(shiny)
+#'# Only run examples in interactive R sessions
+#'if (interactive()) {
+#'   ui <- fluidPage(
+#'          label3("Welcome"),
+#'          radioButtons3("mydata", "mydata", choices=c("mtcars","iris")),
+#'          verbatimTextOutput("value")
+#'   )
+#'   server <- function(input, output) {
+#'         output$value <- renderText({ input$mydata })
+#'   }
+#'   shinyApp(ui, server)
+#'}
+radioButtons3<-function(inputId,label,choices,bg=NULL,labelwidth=100,inline=FALSE,align="right",...){
+     style=paste0("width: ",labelwidth,"px;")
+     if(inline) style=paste0(style,"text-align:",align,";")
+     if(!is.null(bg)) style=paste0(style,"background-color:",bg,";")
+     if(inline){
+          div(style="display:inline-block;",
+              tags$label(label, style=style,`for` = inputId,class="control-label"),
+              div(style="display:inline-block;",
+                  radioButtons(inputId,NULL,choices,inline=inline,...)
+              )
+          )
+     } else{
+
+          div(style="display:inline-block;",
+              radioButtons(inputId,label,choices,...)
+
+          )
+
+     }
+}
+
+#'Create a side-by-side dateInput
+#'@param inputId The input slot that will be used to access the value.
+#'@param label Display label for the control, or NULL for no label.
+#'@param width The width of the input in pixel
+#'@param ... arguments to be passed to dateInput
+#'@importFrom shiny dateInput
+#'@export
+#'@examples
+#'library(shiny)
+#'# Only run examples in interactive R sessions
+#'if (interactive()) {
+#'   ui <- fluidPage(
+#'          label3("Welcome"),
+#'          dateInput3("date", "date"),
+#'          verbatimTextOutput("value")
+#'   )
+#'   server <- function(input, output) {
+#'         output$value <- renderText({ input$date })
+#'   }
+#'   shinyApp(ui, server)
+#'}
+dateInput3<-function(inputId,label,width=100,...){
+     div(style="display:inline-block;",
+         dateInput(inputId,label,width=paste0(width,"px"),...)
+     )
 }
