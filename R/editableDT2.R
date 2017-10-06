@@ -308,7 +308,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
                 } else if("Date" %in% myclass[[i]]){
                     mylist[[i+addno]]=dateInput3(ns(myname),myname,value=mydf[1,i],width=input$width2)
                 } else if("logical" %in% myclass[[i]]){
-                    if(is.na(mydf[input$no,i])) myvalue=FALSE
+                    if(is.na(mydf[1,i])) myvalue=FALSE
                     else myvalue=mydf[1,i]
                     mylist[[i+addno]]=checkboxInput3(ns(myname),myname,value=myvalue,width=input$width2)
                 } else { # c("numeric","integer","charater")
