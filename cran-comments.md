@@ -10,7 +10,7 @@ This is an update of the package 'editData'.
 3) Several bugs fixed.
 
 ## Test environments
-* local OS X install, R 3.4.1
+* local OS X install, R 3.4.2
 * win-builder (devel and release)
 
 ## R CMD check results
