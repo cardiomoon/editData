@@ -1,6 +1,9 @@
 This is an update of the package 'editData'.
 
-1) I have rewrite vignette to explain modularized functions. These module are intended for reuse across applications.
+1) I had released 'editData' package(version 0.1.1) several days ago, but some bugs were found.
+   So I have to update my package. I am sorry about that. 
+
+2) I have rewrite vignette to explain modularized functions. These module are intended for reuse across applications.
 
 2) I have added several executable exmaples in the `inst` folder.
 
