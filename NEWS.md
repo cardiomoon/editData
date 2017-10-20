@@ -1,3 +1,13 @@
+# editData 0.1.3
+================
+(2017-Oct-20)
+
+* New function "selectizeInput3" added
+
+* Added "insertRow" actionButton in "editableDT" module
+
+* Bug fixed
+
 # editData 0.1.2
 =================
 (2017-Oct-8)

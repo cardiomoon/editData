@@ -237,3 +237,27 @@ dateInput3<-function(inputId,label,width=100,...){
          dateInput(inputId,label,width=paste0(width,"px"),...)
      )
 }
+
+#' side-by-side selectizeInput
+#'
+#' @param ... Further arguments to be passed to selectizeInput
+#' @param width Input width in pixel
+#' @importFrom shiny selectizeInput
+#' @export
+#'@examples
+#'library(shiny)
+#'# Only run examples in interactive R sessions
+#'if (interactive()) {
+#'   ui <- fluidPage(
+#'          selectizeInput3("color", "color", choices=colors())
+#'     )
+#'     server <- function(input, output) {
+#'
+#'     }
+#'     shinyApp(ui, server)
+#'}
+selectizeInput3=function (..., width = 100)
+{
+     mywidth = paste(width, "px", sep = "")
+     div(style = "display:inline-block;", selectizeInput(..., width = mywidth))
+}

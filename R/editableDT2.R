@@ -36,6 +36,7 @@ editableDTUI <- function(id){
 
         actionButton(ns("delRow"),"Delete",icon=icon("remove",lib="glyphicon")),
         actionButton(ns("addRow"),"Add New",icon=icon("plus",lib="glyphicon")),
+        actionButton(ns("insertRow"),"Insert Row",icon=icon("hand-up",lib="glyphicon")),
         actionButton(ns("editData"),"Edit Data",icon=icon("wrench",lib="glyphicon")),
         radioButtons3(ns("selection"),"Data Selection",choices=c("single","multiple"),
                       inline=TRUE,labelwidth=150,align="center"),
@@ -60,7 +61,7 @@ editableDTUI <- function(id){
 #' @param dataname A string of representing data name
 #' @param data A data object
 #' @param inputwidth Numeric indicating default input width in pixel
-#' @importFrom shiny updateTextInput updateNumericInput reactive validate need showModal modalDialog updateDateInput updateCheckboxInput updateSelectInput observe modalButton renderUI
+#' @importFrom shiny updateTextInput updateNumericInput reactive validate need showModal modalDialog updateDateInput updateCheckboxInput updateSelectInput observe modalButton renderUI textAreaInput updateTextAreaInput
 #' @importFrom DT renderDataTable datatable
 #' @export
 editableDT <- function(input, output, session, dataname=reactive(""),data=reactive(NULL),inputwidth=reactive(100)) {
@@ -167,6 +168,48 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
 
     })
 
+    observeEvent(input$insertRow,{
+         ids <- input$origTable_rows_selected
+         if(length(ids)>0){
+              ids<-ids[1]
+              if(ids>1){
+              x<-as.data.frame(df())
+              x1 <- x[1:(ids-1),]
+
+              x1 <- tibble::add_row(x1)
+              x1 <-rbind(x1,x[ids:nrow(x),])
+
+              newname=max(as.numeric(rownames(x)),nrow(x),na.rm=TRUE)+1
+              rownames(x1)=c(rownames(x)[1:(ids-1)],newname,rownames(x)[ids:nrow(x)])
+              } else{
+                   x<-as.data.frame(df())
+                   x1<-x
+                   x1 <- tibble::add_row(x1)
+                   x1=x1[c(nrow(x1),1:(nrow(x1)-1)),]
+
+                   newname=max(as.numeric(rownames(x)),nrow(x),na.rm=TRUE)+1
+                   rownames(x1)=c(newname,rownames(x))
+              }
+               if(input$result=="added"){
+                    added1<<-x1
+                    updateTextInput(session,"result",value="added1")
+               } else{
+                    added<<-x1
+                    updateTextInput(session,"result",value="added")
+               }
+
+         } else{
+              showModal(modalDialog(
+                   title = "Insert New Data",
+                   "Please Select Row To Insert. Press 'Esc' or Press 'OK' button",
+                   easyClose = TRUE,
+                   footer=modalButton("OK")
+              ))
+         }
+
+
+    })
+
     observeEvent(input$new,{
 
         x<-as.data.frame(df())
@@ -195,9 +238,9 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
         x<-as.data.frame(x)
         rownames(x)[ids]=input$rowname
 
-        for(i in 1:ncol(x)){
-            x[ids,i]=input[[myname[i]]]
-        }
+        # for(i in 1:ncol(x)){
+        #     x[ids,i]=input[[myname[i]]]
+        # }
 
         for(i in 1:ncol(x)){
              #x[ids,i]=input[[myname[i]]]
@@ -223,14 +266,14 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
     })
 
     observeEvent(input$no,{
-        mydf=df()
+        mydf2=df()
 
-        if(!is.null(mydf)){
-        myclass=lapply(mydf,class)
+        if(!is.null(mydf2)){
+        myclass=lapply(mydf2,class)
 
-        updateTextInput(session,"rowname",value=rownames(mydf)[input$no])
+        updateTextInput(session,"rowname",value=rownames(mydf2)[input$no])
         updateNumericInput(session,"width",value=input$width)
-        mydf=as.data.frame(mydf[input$no,])
+        mydf=as.data.frame(mydf2[input$no,])
         for(i in 1:ncol(mydf)){
             myname=colnames(mydf)[i]
             if("factor" %in% myclass[[i]]){
@@ -243,7 +286,13 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
                 else myvalue=mydf[1,i]
                 updateCheckboxInput(session,myname,value=myvalue)
             } else { # c("numeric","integer","charater")
-                updateTextInput(session,myname,value=mydf[1,i])
+
+                 mywidth=(((max(nchar(mydf2[[i]]),na.rm=TRUE)*8) %/% input$width2)+1)*input$width2
+                 if(mywidth<=500){
+                    updateTextInput(session,myname,value=mydf[1,i])
+                 } else{
+                      updateTextAreaInput(session,myname,value=mydf[1,i])
+                 }
             }
         }
         }
@@ -285,21 +334,21 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
         ids <- input$no
         if(length(ids)==1){
 
-            mydf=df()
+            mydf2=df()
             mylist=list()
-            myclass=lapply(mydf,class)
+            myclass=lapply(mydf2,class)
             mylist[[1]]=actionButton(ns("home"),"",icon=icon("backward",lib="glyphicon"))
             mylist[[2]]=actionButton(ns("left"),"",icon=icon("chevron-left",lib="glyphicon"))
             mylist[[3]]=numericInput3(ns("rowno"),"rowno",value=input$no,min=1,
-                                      max=nrow(mydf),step=1,width=50+10*log10(nrow(mydf)))
+                                      max=nrow(mydf2),step=1,width=50+10*log10(nrow(mydf2)))
             mylist[[4]]=actionButton(ns("right"),"",icon=icon("chevron-right",lib="glyphicon"))
             mylist[[5]]=actionButton(ns("end"),"",icon=icon("forward",lib="glyphicon"))
             mylist[[6]]=actionButton(ns("new"),"",icon=icon("plus",lib="glyphicon"))
-            mylist[[7]]=textInput3(ns("rowname"),"rowname",value=rownames(mydf)[input$no],width=150)
+            mylist[[7]]=textInput3(ns("rowname"),"rowname",value=rownames(mydf2)[input$no],width=150)
             mylist[[8]]=numericInput3(ns("width"),"input width",value=input$width2,min=100,max=500,step=50,width=80)
             mylist[[9]]=hr()
             addno=9
-            mydf=as.data.frame(mydf[input$no,])
+            mydf=as.data.frame(mydf2[input$no,])
             for(i in 1:ncol(mydf)){
                 myname=colnames(mydf)[i]
                 if("factor" %in% myclass[[i]]){
@@ -312,7 +361,15 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
                     else myvalue=mydf[1,i]
                     mylist[[i+addno]]=checkboxInput3(ns(myname),myname,value=myvalue,width=input$width2)
                 } else { # c("numeric","integer","charater")
-                    mylist[[i+addno]]=textInput3(ns(myname),myname,value=mydf[1,i],width=input$width2)
+                     #cat("max(nchar(mydf2[[i]]))=",max(nchar(mydf2[[i]])))
+                     #cat("\n",mydf2[[i]][which.max(nchar(mydf2[[i]]))],"\n")
+                     mywidth=(((max(nchar(mydf2[[i]]),na.rm=TRUE)*8) %/% input$width2)+1)*input$width2
+                     #cat("mywidth=",mywidth,"\n")
+                     if(mywidth<=500){
+                     mylist[[i+addno]]=textInput3(ns(myname),myname,value=mydf[1,i],width=mywidth)
+                     } else{
+                          mylist[[i+addno]]=textAreaInput(ns(myname),myname,value=mydf[1,i],width="500px")
+                     }
                 }
             }
             do.call(tagList,mylist)
@@ -443,6 +500,7 @@ server=function(input,output,session){
             updateTextInput(session,"mydata",value="uploaded")
         }
     })
+
 
     # mydf<-editData::sampleData
     #
