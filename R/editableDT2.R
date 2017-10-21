@@ -34,12 +34,14 @@ editableDTUI <- function(id){
     fluidPage(
     fluidRow(
 
-        actionButton(ns("delRow"),"Delete",icon=icon("remove",lib="glyphicon")),
+        actionButton(ns("delRow"),"Delete Row",icon=icon("remove",lib="glyphicon")),
         actionButton(ns("addRow"),"Add New",icon=icon("plus",lib="glyphicon")),
         actionButton(ns("insertRow"),"Insert Row",icon=icon("hand-up",lib="glyphicon")),
         actionButton(ns("editData"),"Edit Data",icon=icon("wrench",lib="glyphicon")),
+        actionButton(ns("newCol"),"New Col",icon=icon("plus-sign",lib="glyphicon")),
+        actionButton(ns("removeCol"),"Remove Col",icon=icon("trash",lib="glyphicon")),
         radioButtons3(ns("selection"),"Data Selection",choices=c("single","multiple"),
-                      inline=TRUE,labelwidth=150,align="center"),
+                      inline=TRUE,labelwidth=130,align="center"),
         # radioButtons3(ns("resultAs"),"Resultant Data as",choices=c("tibble","data.frame"),inline=TRUE,labelwidth=150,align="center"),
         p(""),
         DT::dataTableOutput(ns("origTable")),
@@ -61,7 +63,7 @@ editableDTUI <- function(id){
 #' @param dataname A string of representing data name
 #' @param data A data object
 #' @param inputwidth Numeric indicating default input width in pixel
-#' @importFrom shiny updateTextInput updateNumericInput reactive validate need showModal modalDialog updateDateInput updateCheckboxInput updateSelectInput observe modalButton renderUI textAreaInput updateTextAreaInput
+#' @importFrom shiny updateTextInput updateNumericInput reactive validate need showModal modalDialog updateDateInput updateCheckboxInput updateSelectInput observe modalButton renderUI textAreaInput updateTextAreaInput removeModal
 #' @importFrom DT renderDataTable datatable
 #' @export
 editableDT <- function(input, output, session, dataname=reactive(""),data=reactive(NULL),inputwidth=reactive(100)) {
@@ -131,11 +133,28 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
         }
     })
 
-    observeEvent(input$remove,{
+    observeEvent(input$removeCol,{
 
+         ns <- session$ns
+         x<-as.data.frame(df())
+         showModal(modalDialog(
+              title = "Delete Column",
+              "Please Select Row(s) To Delete. Press 'Esc' or Press 'OK' button",
+              selectInput(ns("colRemove"),"Column to Remove",choices=colnames(x)),
+              easyClose = TRUE,
+              footer=tagList(
+                   modalButton("Cancel"),
+                   actionButton(ns("delCol"),"Remove")
+              )
+         ))
 
-        x<-as.data.frame(df())
-        x <- x[-input$no,]
+    })
+
+    observeEvent(input$delCol,{
+
+         x<-as.data.frame(df())
+
+         x<- eval(parse(text=paste0("select(x,-",input$colRemove,")")))
 
         if(input$result=="deleted"){
             deleted1<<-x
@@ -144,7 +163,62 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
             deleted<<-x
             updateTextInput(session,"result",value="deleted")
         }
-        if(input$no>nrow(x)) updateNumericInput(session,"no",value=nrow(x))
+        removeModal()
+
+    })
+
+    observeEvent(input$newCol,{
+
+         ns <- session$ns
+         x<-as.data.frame(df())
+         showModal(modalDialog(
+              title = "Calculate New Column",
+              "You can add new column. Press 'Esc' or Press 'Mutate' button",
+              textInput(ns("newColText"),"Calucate Column",value="",placeholder="LDL = TC - HDL - TG/5"),
+              easyClose = TRUE,
+              footer=tagList(
+                   modalButton("Cancel"),
+                   actionButton(ns("mutateCol"),"Mutate")
+              )
+         ))
+
+    })
+
+    observeEvent(input$mutateCol,{
+
+         x<-as.data.frame(df())
+
+         x<- tryCatch(eval(parse(text=paste0("mutate(x,",input$newColText,")"))),error=function(e) "error")
+
+         if(any(class(x) %in% c("data.frame","tibble","tbl_df"))) {
+
+         if(input$result=="added"){
+              added1<<-x
+              updateTextInput(session,"result",value="added1")
+         } else{
+              added<<-x
+              updateTextInput(session,"result",value="added")
+         }
+         }
+         removeModal()
+
+    })
+
+
+    observeEvent(input$remove,{
+
+
+         x<-as.data.frame(df())
+         x <- x[-input$no,]
+
+         if(input$result=="deleted"){
+              deleted1<<-x
+              updateTextInput(session,"result",value="deleted1")
+         } else{
+              deleted<<-x
+              updateTextInput(session,"result",value="deleted")
+         }
+         if(input$no>nrow(x)) updateNumericInput(session,"no",value=nrow(x))
 
     })
 
@@ -197,6 +271,8 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
                     added<<-x1
                     updateTextInput(session,"result",value="added")
                }
+              updateNumericInput(session,"no",value=ids)
+              editData2()
 
          } else{
               showModal(modalDialog(
