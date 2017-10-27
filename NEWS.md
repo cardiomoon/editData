@@ -1,3 +1,9 @@
+# editData 0.1.4
+================
+(2017-Oct-27)
+
+* Can manipulate data with dplyr functions 
+
 # editData 0.1.3
 ================
 (2017-Oct-21)

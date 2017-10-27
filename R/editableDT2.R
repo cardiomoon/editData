@@ -40,8 +40,9 @@ editableDTUI <- function(id){
         actionButton(ns("editData"),"Edit Data",icon=icon("wrench",lib="glyphicon")),
         actionButton(ns("newCol"),"New Col",icon=icon("plus-sign",lib="glyphicon")),
         actionButton(ns("removeCol"),"Remove Col",icon=icon("trash",lib="glyphicon")),
-        radioButtons3(ns("selection"),"Data Selection",choices=c("single","multiple"),
-                      inline=TRUE,labelwidth=130,align="center"),
+        actionButton(ns("dplyr"),"Manipulate",icon=icon("scissors",lib="glyphicon")),
+        # radioButtons3(ns("selection"),"Data Selection",choices=c("single","multiple"),
+        #               inline=TRUE,labelwidth=130,align="center"),
         # radioButtons3(ns("resultAs"),"Resultant Data as",choices=c("tibble","data.frame"),inline=TRUE,labelwidth=150,align="center"),
         p(""),
         DT::dataTableOutput(ns("origTable")),
@@ -103,7 +104,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
         }
         datatable(
             df(),
-            selection = input$selection,
+            selection = "single",
             caption = NULL
         )
     })
@@ -199,6 +200,46 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
               added<<-x
               updateTextInput(session,"result",value="added")
          }
+         }
+         removeModal()
+
+    })
+
+    observeEvent(input$dplyr,{
+
+         ns <- session$ns
+         x<-as.data.frame(df())
+         showModal(modalDialog(
+              title = "Data manipulation",
+              "You can manipulate data with dplyr code. Press 'Esc' or Press 'Manipulate' button",
+              textAreaInput(ns("newCode"),"data <- data %>%",value="",rows=5,
+                        placeholder="filter(cyl==6)"),
+              easyClose = TRUE,
+              footer=tagList(
+                   modalButton("Cancel"),
+                   actionButton(ns("manipulate"),"Manipulate")
+              )
+         ))
+
+    })
+
+    observeEvent(input$manipulate,{
+
+         x<-as.data.frame(df())
+
+         mycode=paste0("x %>%",input$newCode)
+
+         x<- tryCatch(eval(parse(text=mycode)),error=function(e) "error")
+
+         if(any(class(x) %in% c("data.frame","tibble","tbl_df"))) {
+
+              if(input$result=="edited"){
+                   edited1<<-x
+                   updateTextInput(session,"result",value="edited1")
+              } else{
+                   edited<<-x
+                   updateTextInput(session,"result",value="edited")
+              }
          }
          removeModal()
 
@@ -556,6 +597,11 @@ ui<-miniPage(
 ))
 
 server=function(input,output,session){
+
+     if(!isNamespaceLoaded("tidyverse")){
+          attachNamespace("tidyverse")
+     }
+
     uploaded <-c()
 
     mydf=reactive({
