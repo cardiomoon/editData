@@ -6,6 +6,7 @@ ui <- fluidPage(
     textInput("mydata","Enter data name",value="mtcars"),
     editableDTUI("table1"),
     verbatimTextOutput("test"),
+    textInput("mydata2","Enter data name",value="sampleData"),
     editableDTUI("table2"),
     verbatimTextOutput("test2")
 )
@@ -15,8 +16,8 @@ server <- function(input, output) {
     output$test=renderPrint({
          str(df())
     })
-    mydf<-editData::sampleData
-    df2=callModule(editableDT,"table2",data=reactive(mydf))
+    #mydf<-editData::sampleData
+    df2=callModule(editableDT,"table2",dataname=reactive(input$mydata2))
     output$test2=renderPrint({
          str(df2())
     })
