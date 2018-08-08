@@ -83,11 +83,10 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
 
 
     df=reactive({
-
-          if(input$result!="") {
+          if(is.null(input$result)){
+              df<-data()
+          } else if(input$result!="") {
               df<-eval(parse(text=input$result))
-
-
           }
           else df<-data()
 
@@ -342,7 +341,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
             added<<-x1
             updateTextInput(session,"result",value="added")
         }
-        updateNumericInput(session,"no",value=nrow(x1))
+        updateNumericInput(session,"no",value=newname)
 
     })
 
@@ -437,6 +436,9 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
 
     observeEvent(input$rowno,{
         maxno=nrow(df())
+        print(maxno)
+        print(input$rowno)
+        if(is.na(input$rowno)) updateNumericInput(session,"rowno",value=maxno)
         if(input$rowno>maxno) {
             updateNumericInput(session,"rowno",value=maxno)
             updateNumericInput(session,"no",value=maxno)

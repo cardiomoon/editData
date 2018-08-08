@@ -1,7 +1,7 @@
 Package: editData
 Type: Package
 Title: 'RStudio' Addin for Editing a 'data.frame'
-Version: 0.1.4
+Version: 0.1.4.1
 Imports:
     shiny (>= 0.13),
     miniUI (>= 0.1.1),
