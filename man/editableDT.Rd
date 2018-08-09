@@ -5,7 +5,7 @@
 \title{Server function of editData Shiny module}
 \usage{
 editableDT(input, output, session, dataname = reactive(""),
-  data = reactive(NULL), inputwidth = reactive(100))
+  data = reactive(NULL), inputwidth = reactive(100), mode = reactive(1))
 }
 \arguments{
 \item{input}{input}
@@ -19,6 +19,8 @@ editableDT(input, output, session, dataname = reactive(""),
 \item{data}{A data object}
 
 \item{inputwidth}{Numeric indicating default input width in pixel}
+
+\item{mode}{An integer}
 }
 \description{
 Server function of editData Shiny module

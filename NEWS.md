@@ -1,3 +1,12 @@
+# ediaData 0.1.5
+================
+(2018-8-9)
+
+* support mode argument. See inst/example/app.R
+
+* Support DT with editable=TRUE. You can edit data by double-click the cell.
+
+
 # editData 0.1.4
 ================
 (2017-Oct-27)

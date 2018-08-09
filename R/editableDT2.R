@@ -33,19 +33,13 @@ editableDTUI <- function(id){
     ns=NS(id)
     fluidPage(
     fluidRow(
+        uiOutput(ns("buttons")),
 
-        actionButton(ns("delRow"),"Delete Row",icon=icon("remove",lib="glyphicon")),
-        actionButton(ns("addRow"),"Add New",icon=icon("plus",lib="glyphicon")),
-        actionButton(ns("insertRow"),"Insert Row",icon=icon("hand-up",lib="glyphicon")),
-        actionButton(ns("editData"),"Edit Data",icon=icon("wrench",lib="glyphicon")),
-        actionButton(ns("newCol"),"New Col",icon=icon("plus-sign",lib="glyphicon")),
-        actionButton(ns("removeCol"),"Remove Col",icon=icon("trash",lib="glyphicon")),
-        actionButton(ns("dplyr"),"Manipulate",icon=icon("scissors",lib="glyphicon")),
         # radioButtons3(ns("selection"),"Data Selection",choices=c("single","multiple"),
         #               inline=TRUE,labelwidth=130,align="center"),
         # radioButtons3(ns("resultAs"),"Resultant Data as",choices=c("tibble","data.frame"),inline=TRUE,labelwidth=150,align="center"),
         p(""),
-        DT::dataTableOutput(ns("origTable")),
+        DT::DTOutput(ns("origTable")),
         conditionalPanel(condition="true==false",
                          numericInput(ns("width2"),"width2",value=100),
                          textInput(ns("result"),"result",value=""),
@@ -64,12 +58,15 @@ editableDTUI <- function(id){
 #' @param dataname A string of representing data name
 #' @param data A data object
 #' @param inputwidth Numeric indicating default input width in pixel
+#' @param mode An integer
 #' @importFrom shiny updateTextInput updateNumericInput reactive validate need showModal modalDialog updateDateInput updateCheckboxInput updateSelectInput observe modalButton renderUI textAreaInput updateTextAreaInput removeModal
-#' @importFrom DT renderDataTable datatable
+#' @importFrom DT renderDataTable datatable dataTableProxy replaceData
 #' @export
-editableDT <- function(input, output, session, dataname=reactive(""),data=reactive(NULL),inputwidth=reactive(100)) {
+editableDT <- function(input, output, session, dataname=reactive(""),data=reactive(NULL),inputwidth=reactive(100),mode=reactive(2)) {
 
-     deleted<-deleted1<-edited<-edited1<-added<-added1<-updated1<-updated<-c()
+    deleted<-deleted1<-edited<-edited1<-added<-added1<-updated1<-updated<-restored<-restored1<-c()
+
+    defaultlen=20
 
     observe({
 
@@ -93,8 +90,23 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
           df
     })
 
+    output$buttons <-renderUI({
+        ns <- session$ns
+        amode=mode()
+        tagList(
+        actionButton(ns("delRow"),"Delete Row",icon=icon("remove",lib="glyphicon")),
+        actionButton(ns("addRow"),"Add New",icon=icon("plus",lib="glyphicon")),
+        actionButton(ns("insertRow"),"Insert Row",icon=icon("hand-up",lib="glyphicon")),
+        actionButton(ns("editData"),"Edit Data",icon=icon("wrench",lib="glyphicon")),
+        if(amode==1) actionButton(ns("newCol"),"New Col",icon=icon("plus-sign",lib="glyphicon")),
+        if(amode==1) actionButton(ns("removeCol"),"Remove Col",icon=icon("trash",lib="glyphicon")),
+        if(amode==1) actionButton(ns("dplyr"),"Manipulate",icon=icon("scissors",lib="glyphicon")),
+        if(amode==2) actionButton(ns("reset"),"Reset",icon=icon("remove-sign",lib="glyphicon")),
+        if(amode==2) actionButton(ns("restore"),"Restore",icon=icon("heart",lib="glyphicon"))
+        )
+    })
 
-    output$origTable <- DT::renderDataTable({
+    output$origTable <- DT::renderDT({
         if(dataname()!=""){
         validate(
             need(any(class(try(eval(parse(text=input$result)))) %in% c("tbl_df","tibble","data.frame")),
@@ -104,14 +116,38 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
         datatable(
             df(),
             selection = "single",
+            editable=TRUE,
             caption = NULL
         )
+    })
+
+    proxy = dataTableProxy('origTable')
+
+    observeEvent(input$origTable_cell_edit, {
+
+        info = input$origTable_cell_edit
+        str(info)
+        i = info$row
+        j = info$col
+        v = info$value
+        x <- df()
+        x[i, j] <- DT::coerceValue(v, x[i, j])
+        replaceData(proxy, x, resetPaging = FALSE)  # important
+
+        if(input$result=="updated"){
+            updated1<<-x
+            updateTextInput(session,"result",value="updated1")
+        } else{
+            updated<<-x
+            updateTextInput(session,"result",value="updated")
+        }
     })
 
     observeEvent(input$delRow,{
         ids <- input$origTable_rows_selected
         if(length(ids)>0){
             x<-as.data.frame(df())
+            restored<<-x
             x <- x[-ids,]
 
             if(input$result=="deleted"){
@@ -132,6 +168,38 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
             ))
         }
     })
+
+    observeEvent(input$reset,{
+
+
+            x<-as.data.frame(df())
+            restored<<-x
+            x <- x[-c(1:nrow(x)),]
+
+            if(input$result=="deleted"){
+                deleted1<<-x
+                updateTextInput(session,"result",value="deleted1")
+            } else{
+                deleted<<-x
+                updateTextInput(session,"result",value="deleted")
+            }
+   })
+
+    observeEvent(input$restore,{
+
+
+        if(length(restored) >0){
+            updateTextInput(session,"result",value="restored")
+        }  else {
+            showModal(modalDialog(
+                title = "Retore",
+                "You can restore data after reset or delete row. Press 'Esc' or Press 'OK' button",
+                easyClose = TRUE,
+                footer=modalButton("OK")
+            ))
+        }
+    })
+
 
     observeEvent(input$removeCol,{
 
@@ -348,6 +416,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
     observeEvent(input$update,{
         ids <- input$no
         x<-df()
+        restored<<-x
 
         myname=colnames(x)
         status=ifelse(tibble::has_rownames(x),1,0)
@@ -403,7 +472,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
                 updateCheckboxInput(session,myname,value=myvalue)
             } else { # c("numeric","integer","charater")
 
-                 mywidth=(((max(nchar(mydf2[[i]]),na.rm=TRUE)*8) %/% input$width2)+1)*input$width2
+                 mywidth=(((max(nchar(mydf2[[i]]),defaultlen,na.rm=TRUE)*8) %/% input$width2)+1)*input$width2
                  if(mywidth<=500){
                     updateTextInput(session,myname,value=mydf[1,i])
                  } else{
@@ -482,7 +551,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
                 } else { # c("numeric","integer","charater")
                      #cat("max(nchar(mydf2[[i]]))=",max(nchar(mydf2[[i]])))
                      #cat("\n",mydf2[[i]][which.max(nchar(mydf2[[i]]))],"\n")
-                     mywidth=(((max(nchar(mydf2[[i]]),na.rm=TRUE)*8) %/% input$width2)+1)*input$width2
+                     mywidth=(((max(nchar(mydf2[[i]]),defaultlen,na.rm=TRUE)*8) %/% input$width2)+1)*input$width2
                      #cat("mywidth=",mywidth,"\n")
                      if(mywidth<=500){
                      mylist[[i+addno]]=textInput3(ns(myname),myname,value=mydf[1,i],width=mywidth)
@@ -539,6 +608,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
 #' A shiny app for editing a 'data.frame'
 #' @param data A tibble or a tbl_df or a data.frame to manipulate
 #' @param viewer Specify where the gadget should be displayed. Possible choices are c("dialog","browser","pane")
+#' @param mode An integer
 #' @importFrom rstudioapi getActiveDocumentContext
 #' @importFrom miniUI miniPage gadgetTitleBar miniContentPanel
 #' @importFrom utils read.csv str write.csv
@@ -553,7 +623,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
 #'     result<-editData(mtcars)
 #'     result
 #' }
-editData=function(data=NULL,viewer="dialog"){
+editData=function(data=NULL,viewer="dialog",mode=2){
 
     sampleData<-editData::sampleData
     context <- rstudioapi::getActiveDocumentContext()
@@ -612,7 +682,7 @@ server=function(input,output,session){
         mydf=eval(parse(text=input$mydata))
         mydf
     })
-    df=callModule(editableDT,"table1",data=reactive(mydf()),inputwidth=reactive(170))
+    df=callModule(editableDT,"table1",data=reactive(mydf()),inputwidth=reactive(170),mode=reactive(mode))
 
     # output$test=renderPrint({
     #     str(df())

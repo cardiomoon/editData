@@ -11,7 +11,7 @@ ui <- fluidPage(
     verbatimTextOutput("test2")
 )
 server <- function(input, output) {
-    df=callModule(editableDT,"table1",dataname=reactive(input$mydata),inputwidth=reactive(170))
+    df=callModule(editableDT,"table1",dataname=reactive(input$mydata),inputwidth=reactive(170),mode=reactive(1))
 
     output$test=renderPrint({
          str(df())
