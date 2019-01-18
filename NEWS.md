@@ -4,6 +4,7 @@
 
 * bug-fixed
 
+* New function "editFiles" added 
 
 # editData 0.1.5
 ================

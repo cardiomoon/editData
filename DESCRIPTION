@@ -9,6 +9,7 @@ Imports:
     DT,
     tibble,
     dplyr,
+    rio,
     magrittr
 Authors@R: person("Keon-Woong", "Moon", email = "cardiomoon@gmail.com",
                   role = c("aut", "cre"))

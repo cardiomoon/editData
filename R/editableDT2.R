@@ -40,7 +40,7 @@ editableDTUI <- function(id){
         # radioButtons3(ns("resultAs"),"Resultant Data as",choices=c("tibble","data.frame"),inline=TRUE,labelwidth=150,align="center"),
         p(""),
         DT::DTOutput(ns("origTable")),
-        conditionalPanel(condition="true==true",
+        conditionalPanel(condition="true==false",
                          numericInput(ns("width2"),"width2",value=100),
                          textInput(ns("result"),"result",value=""),
                          numericInput(ns("no"),"no",value=1),
@@ -263,7 +263,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
          showModal(modalDialog(
               title = "Calculate New Column",
               "You can add new column. Press 'Esc' or Press 'Mutate' button",
-              textInput(ns("newColText"),"Calucate Column",value="",placeholder="LDL = TC - HDL - TG/5"),
+              textInput(ns("newColText"),"Calculate Column",value="",placeholder="LDL = TC - HDL - TG/5"),
               easyClose = TRUE,
               footer=tagList(
                    modalButton("Cancel"),
