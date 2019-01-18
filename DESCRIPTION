@@ -1,13 +1,15 @@
 Package: editData
 Type: Package
 Title: 'RStudio' Addin for Editing a 'data.frame'
-Version: 0.1.5
+Version: 0.1.6
 Imports:
     shiny (>= 0.13),
     miniUI (>= 0.1.1),
     rstudioapi (>= 0.5),
     DT,
-    tibble
+    tibble,
+    dplyr,
+    magrittr
 Authors@R: person("Keon-Woong", "Moon", email = "cardiomoon@gmail.com",
                   role = c("aut", "cre"))
 Description: An 'RStudio' addin for editing a 'data.frame' or a 'tibble'. You can delete, add or update a 'data.frame'
@@ -19,7 +21,7 @@ License: GPL-3
 Encoding: UTF-8
 Depends: R (>= 2.10)
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr

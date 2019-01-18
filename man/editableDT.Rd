@@ -5,7 +5,8 @@
 \title{Server function of editData Shiny module}
 \usage{
 editableDT(input, output, session, dataname = reactive(""),
-  data = reactive(NULL), inputwidth = reactive(100), mode = reactive(1))
+  data = reactive(NULL), inputwidth = reactive(100),
+  mode = reactive(2))
 }
 \arguments{
 \item{input}{input}

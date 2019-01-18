@@ -40,10 +40,13 @@ editableDTUI <- function(id){
         # radioButtons3(ns("resultAs"),"Resultant Data as",choices=c("tibble","data.frame"),inline=TRUE,labelwidth=150,align="center"),
         p(""),
         DT::DTOutput(ns("origTable")),
-        conditionalPanel(condition="true==false",
+        conditionalPanel(condition="true==true",
                          numericInput(ns("width2"),"width2",value=100),
                          textInput(ns("result"),"result",value=""),
-                         numericInput(ns("no"),"no",value=1))
+                         numericInput(ns("no"),"no",value=1),
+                         numericInput(ns("page"),"page",value=1),
+                         checkboxInput(ns("resetPage"),"resetPage",value=FALSE)
+                         )
 
 
     )
@@ -60,7 +63,9 @@ editableDTUI <- function(id){
 #' @param inputwidth Numeric indicating default input width in pixel
 #' @param mode An integer
 #' @importFrom shiny updateTextInput updateNumericInput reactive validate need showModal modalDialog updateDateInput updateCheckboxInput updateSelectInput observe modalButton renderUI textAreaInput updateTextAreaInput removeModal
-#' @importFrom DT renderDataTable datatable dataTableProxy replaceData
+#' @importFrom DT renderDataTable datatable dataTableProxy replaceData selectPage
+#' @importFrom dplyr select
+#' @importFrom magrittr "%>%"
 #' @export
 editableDT <- function(input, output, session, dataname=reactive(""),data=reactive(NULL),inputwidth=reactive(100),mode=reactive(2)) {
 
@@ -113,20 +118,32 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
                  "Please enter the valid data name")
         )
         }
+        updateCheckboxInput(session,"resetPage",value=TRUE)
         datatable(
             df(),
             selection = "single",
             editable=TRUE,
             caption = NULL
         )
+
+
     })
 
     proxy = dataTableProxy('origTable')
 
+    observeEvent(input$resetPage,{
+        if(input$resetPage){
+        proxy %>% selectPage(input$page)
+        updateCheckboxInput(session,"resetPage",value=FALSE)
+        }
+    })
+
+
     observeEvent(input$origTable_cell_edit, {
 
         info = input$origTable_cell_edit
-        str(info)
+        # str(info)
+
         i = info$row
         j = info$col
         v = info$value
@@ -141,6 +158,9 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
             updated<<-x
             updateTextInput(session,"result",value="updated")
         }
+        updateNumericInput(session,"page",value=(i-1)%/%10+1)
+
+
     })
 
     observeEvent(input$delRow,{
@@ -157,6 +177,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
                 deleted<<-x
                 updateTextInput(session,"result",value="deleted")
             }
+            updateNumericInput(session,"page",value=(ids[1]-1)%/%10+1)
 
 
         } else {
@@ -256,18 +277,21 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
 
          x<-as.data.frame(df())
 
-         x<- tryCatch(eval(parse(text=paste0("mutate(x,",input$newColText,")"))),error=function(e) "error")
+         x1<- tryCatch(eval(parse(text=paste0("mutate(x,",input$newColText,")"))),error=function(e) "error")
 
          if(any(class(x) %in% c("data.frame","tibble","tbl_df"))) {
 
-         if(input$result=="added"){
-              added1<<-x
+             rownames(x1)<- rownames(x)
+
+             if(input$result=="added"){
+              added1<<-x1
               updateTextInput(session,"result",value="added1")
          } else{
-              added<<-x
+              added<<-x1
               updateTextInput(session,"result",value="added")
          }
          }
+
          removeModal()
 
     })
@@ -296,15 +320,17 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
 
          mycode=paste0("x %>%",input$newCode)
 
-         x<- tryCatch(eval(parse(text=mycode)),error=function(e) "error")
+         x1<- tryCatch(eval(parse(text=mycode)),error=function(e) "error")
 
          if(any(class(x) %in% c("data.frame","tibble","tbl_df"))) {
 
+             if(nrow(x1)==nrow(x)) rownames(x1)<- rownames(x)
+
               if(input$result=="edited"){
-                   edited1<<-x
+                   edited1<<-x1
                    updateTextInput(session,"result",value="edited1")
               } else{
-                   edited<<-x
+                   edited<<-x1
                    updateTextInput(session,"result",value="edited")
               }
          }
@@ -347,6 +373,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
         }
         updateNumericInput(session,"no",value=nrow(x1))
         editData2()
+        updateNumericInput(session,"page",value=(nrow(x)-1)%/%10+1)
 
     })
 
@@ -381,6 +408,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
                }
               updateNumericInput(session,"no",value=ids)
               editData2()
+              updateNumericInput(session,"page",value=(ids-1)%/%10+1)
 
          } else{
               showModal(modalDialog(
@@ -579,6 +607,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
         else if(input$no>nrow(df())) updateNumericInput(session,"no",value=1)
         #updateCheckboxInput(session,"showEdit",value=TRUE)
         editData2()
+        updateNumericInput(session,"page",value=(ids-1)%/%10+1)
     })
 
     editData2=reactive({

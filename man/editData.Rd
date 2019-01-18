@@ -4,7 +4,7 @@
 \alias{editData}
 \title{A shiny app for editing a 'data.frame'}
 \usage{
-editData(data = NULL, viewer = "dialog", mode = 1)
+editData(data = NULL, viewer = "dialog", mode = 2)
 }
 \arguments{
 \item{data}{A tibble or a tbl_df or a data.frame to manipulate}
