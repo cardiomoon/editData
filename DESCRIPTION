@@ -1,7 +1,7 @@
 Package: editData
 Type: Package
 Title: 'RStudio' Addin for Editing a 'data.frame'
-Version: 0.1.6
+Version: 0.1.6.1
 Imports:
     shiny (>= 0.13),
     miniUI (>= 0.1.1),
@@ -22,7 +22,7 @@ License: GPL-3
 Encoding: UTF-8
 Depends: R (>= 2.10)
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr

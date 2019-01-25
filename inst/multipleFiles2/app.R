@@ -2,25 +2,6 @@ library(editData)
 library(tidyverse)
 library(shiny)
 
-file2ext=function(filename){
-     namelist=unlist(strsplit(filename,".",fixed=TRUE))
-     result=namelist[length(namelist)]
-     return(tolower(result))
-}
-
-myimport=function(file,...){
-     ext=file2ext(file)
-     if(ext=="csv"){
-          result<-tryCatch(read.csv(file,stringsAsFactors = FALSE),error=function(c) "error")
-          if(class(result)!="data.frame"){
-               result<-tryCatch(read.csv(file,stringsAsFactors = FALSE,fileEncoding = "euc-kr"),error=function(c) "error")
-          }
-     } else{
-          result=rio::import(file,...)
-     }
-     result
-}
-
 ui <- fluidPage(
     h2("Edit Multiple Files"),
     p("You can edit upto four files side by side."),
