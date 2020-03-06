@@ -4,8 +4,16 @@
 \alias{numericInput3}
 \title{Create a side-by-side numericInput}
 \usage{
-numericInput3(inputId, label, value, min = NA, max = NA, step = NA,
-  width = 100, ...)
+numericInput3(
+  inputId,
+  label,
+  value,
+  min = NA,
+  max = NA,
+  step = NA,
+  width = 100,
+  ...
+)
 }
 \arguments{
 \item{inputId}{The input slot that will be used to access the value.}

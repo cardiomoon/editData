@@ -122,7 +122,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
         datatable(
             df(),
             selection = "single",
-            editable=TRUE,
+            editable="cell",
             caption = NULL
         )
 

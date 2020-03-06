@@ -4,8 +4,16 @@
 \alias{radioButtons3}
 \title{Create a side-by-side radioButtons}
 \usage{
-radioButtons3(inputId, label, choices, bg = NULL, labelwidth = 100,
-  inline = FALSE, align = "right", ...)
+radioButtons3(
+  inputId,
+  label,
+  choices,
+  bg = NULL,
+  labelwidth = 100,
+  inline = FALSE,
+  align = "right",
+  ...
+)
 }
 \arguments{
 \item{inputId}{The input slot that will be used to access the value.}
