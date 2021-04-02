@@ -1,18 +1,13 @@
 This is an update of the package 'editData'.
 
-1) I had released 'editData' package(version 0.1.1) several days ago, but some bugs were found.
-   So I have to update my package. I am sorry about that. 
-
-2) I have rewrite vignette to explain modularized functions. These module are intended for reuse across applications.
-
-2) I have added several executable exmaples in the `inst` folder.
-
-3) Several bugs fixed.
-
 ## Test environments
-* local OS X install, R 3.4.2
+* local OS X install, R 4.0.4
 * win-builder (devel and release)
+* rhub
 
 ## R CMD check results
-There were no ERRORs or WARNINGs.
+There were no ERRORs or WARNINGs or NOTEs.
 
+## Downstream dependencies
+I have also run R CMD check on downstream dependencies of editData.
+All packages that I could install passed
