@@ -79,7 +79,7 @@ knitr::include_graphics("https://raw.githubusercontent.com/cardiomoon/editData/m
 knitr::include_graphics("https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/5.png")
 ```
 
-7. A `dateInput` is assigend for a column of class `date`.
+7. A `dateInput` is assigned for a column of class `date`.
 
 ```{r,echo=FALSE}
 knitr::include_graphics("https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/6.png")
@@ -101,7 +101,7 @@ The resultant 'tibble' or 'data.frame' is assigned to the object `result`.
 
 ## Usage: As a shiny module
 
-The `editData` package is made of modularized shiny functions. You can use the modularized `editableDTUI()` and `editableDT()` functions in your shiny app. In this package, I have included three examples in the `inst` folder. You can run ths examples with one of the following codes.
+The `editData` package is made of modularized shiny functions. You can use the modularized `editableDTUI()` and `editableDT()` functions in your shiny app. In this package, I have included three examples in the `inst` folder. You can run these examples with one of the following codes.
 
 ```{r,eval=FALSE}
 shiny::runApp(system.file('example',package='editData'))

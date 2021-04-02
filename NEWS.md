@@ -4,7 +4,7 @@
 
 * compatible with DT(>=0.17)
 
-* Enhance function of the editableDT module : no more page reset after eidt or delete data
+* Enhance function of the editableDT module : no more page reset after edit or delete data
 
 
 # editData 0.1.7
@@ -63,7 +63,7 @@
 
 * New shiny module functions "editableDTUI" and "editableDT" added. These module are intended for reuse across applications. 
 
-* New function "textInput3","seletInput3","label3","numericInput3","checkboxInput3",
+* New function "textInput3","selectInput3","label3","numericInput3","checkboxInput3",
 "radioButtons3" and "dateInput3" added for side-by-side input
  
 # editData 0.1.0

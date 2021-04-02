@@ -66,7 +66,7 @@ You can enter data name(4) to edit, upload a CSV or excel or RDS file(5) and dow
 
 <img src="https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/5.png" title="plot of chunk unnamed-chunk-7" alt="plot of chunk unnamed-chunk-7" width="70%" style="display: block; margin: auto;" />
 
-7. A `dateInput` is assigend for a column of class `date`.
+7. A `dateInput` is assigned for a column of class `date`.
 
 <img src="https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/6.png" title="plot of chunk unnamed-chunk-8" alt="plot of chunk unnamed-chunk-8" width="70%" style="display: block; margin: auto;" />
 
@@ -87,7 +87,7 @@ The resultant 'tibble' or 'data.frame' is assigned to the object `result`.
 
 ## Usage: As a shiny module
 
-The `editData` package is made of modularized shiny functions. You can use the modularized `editableDTUI()` and `editableDT()` functions in your shiny app. In this package, I have included three examples in the `inst` folder. You can run ths examples with one of the following codes.
+The `editData` package is made of modularized shiny functions. You can use the modularized `editableDTUI()` and `editableDT()` functions in your shiny app. In this package, I have included three examples in the `inst` folder. You can run these examples with one of the following codes.
 
 
 ```r
