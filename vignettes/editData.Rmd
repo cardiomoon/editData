@@ -51,15 +51,16 @@ knitr::include_graphics("https://raw.githubusercontent.com/cardiomoon/editData/m
 knitr::include_graphics("https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/2.png")
 ```
 
-3. You can select and unselect a row by clicking a row in dataTable. You can delete the selected row(1), add a new row(2) or edit a row(3). You can select single or multiple rows(4) to delete.
+3. You can select and unselect a row by clicking a row in dataTable. You can delete the selected row(1), add a new row(2) or edit a row(3). 
 
 ```{r,echo=FALSE}
 knitr::include_graphics("https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/3.png")
 ```
 
-You can enter data name(5) to edit, upload a CSV file(6) and download the edited data as a csv file(7).
+You can enter data name(4) to edit, upload a CSV or excel or RDS file(5) and download the edited data as a csv(6) or xlsx(7) or RDS (8)file.
 
-4. If you press the edit button you can see this window. You can move to the desired row, edit rowname and individual data. You can delete the row or update the data.
+
+4. If you press the edit button you can see this window. You can edit individual cell. You can delete the row or update the data. Or you can edit cell by double-click.
 
 ```{r,echo=FALSE}
 knitr::include_graphics("https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/4.png")
