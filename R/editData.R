@@ -20,7 +20,7 @@
 #' }
 editData=function(data=NULL,viewer="dialog",mode=2){
 
-    data(sampleData,package="editData")
+    data("sampleData",package="editData",envir=environment())
     context <- rstudioapi::getActiveDocumentContext()
 
     # Set the default data to use based on the selection.
