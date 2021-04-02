@@ -24,19 +24,17 @@ server <- function(input, output) {
                 data[[i]]<-myimport(input$file$datapath[i])
                 uiname[[i]]<-paste0("table",i)
                 title=paste0("File No ",i," : ",input$file$name[i])
-                mylist[[5*i-4]]<-h2(title)
-                mylist[[5*i-3]]<-editableDTUI(uiname[[i]])
+                mylist[[3*i-2]]<-h2(title)
+                mylist[[3*i-1]]<-editableDTUI(uiname[[i]])
                 textname[[i]]=paste0("text",i)
                 downloadname[[i]]=paste0("download",i)
                 downloadname2[[i]]=paste0("downloadRDS",i)
-                mylist[[5*i-2]]<-verbatimTextOutput(textname[[i]])
-                mylist[[5*i-1]]<-downloadButton(downloadname[[i]],"download as csv")
-                mylist[[5*i]]<-downloadButton(downloadname2[[i]],"download as RDS")
+                mylist[[3*i]]<-verbatimTextOutput(textname[[i]])
+
 
                 local({
                     j<-i
-                    result[[j]]=callModule(editableDT,uiname[[j]],data=reactive(data[[j]]),
-                                           mode=reactive(2))
+                    result[[j]]=callModule(editableDT,uiname[[j]],data=reactive(data[[j]]))
 
                     output[[textname[[j]]]]=renderPrint({
                      head(result[[j]]())
@@ -64,16 +62,16 @@ server <- function(input, output) {
             tagList(
                  fluidRow(
                       column(colwidth,
-                              mylist[1:5]
+                              mylist[1:3]
                              ),
                       if(count>1) column(colwidth,
-                             mylist[6:10]
+                             mylist[4:6]
                              ),
                       if(count>2) column(colwidth,
-                                        mylist[11:15]
+                                        mylist[7:9]
                       ),
                       if(count>3) column(colwidth,
-                                         mylist[16:20]
+                                         mylist[10:12]
                       )
                  )
             )

@@ -1,3 +1,12 @@
+# editData 0.1.8
+================
+(2021-4-2)
+
+* compatible with DT(>=0.17)
+
+* Enhance function of the editableDT module : no more page reset after eidt or delete data
+
+
 # editData 0.1.7
 ================
 (2020-3-6)

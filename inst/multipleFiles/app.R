@@ -31,7 +31,7 @@ server <- function(input, output) {
                     result[[j]]=callModule(editableDT,uiname[[j]],data=reactive(data[[j]]))
 
                     output[[textname[[j]]]]=renderPrint({
-                     head(result[[j]]())
+                        head(as.data.frame(result[[j]]()))
                     })
                 })
              }

@@ -4,7 +4,8 @@
 \name{sampleData}
 \alias{sampleData}
 \title{Sample Data for testing 'editData' addin}
-\format{A data.frame with 4 rows and 6 variables:
+\format{
+A data.frame with 4 rows and 6 variables:
 \describe{
 \item{name}{Last name}
 \item{age}{age in years}
@@ -12,7 +13,8 @@
 \item{sex}{sex, A factor with two levels.}
 \item{bloodType}{Blood Type. A factor with four levels}
 \item{date}{Date}
-}}
+}
+}
 \usage{
 sampleData
 }

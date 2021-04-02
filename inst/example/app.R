@@ -11,13 +11,28 @@ ui <- fluidPage(
     verbatimTextOutput("test2")
 )
 server <- function(input, output) {
-    df=callModule(editableDT,"table1",dataname=reactive(input$mydata),inputwidth=reactive(170))
+
+    data=reactive({
+        if (!is.null(input$mydata) && nzchar(input$mydata) &&
+            exists(input$mydata) && is.data.frame(get(input$mydata)))
+            # eval(parse(text=input$mydata))
+            get(input$mydata)
+    })
+
+    data2=reactive({
+        if (!is.null(input$mydata2) && nzchar(input$mydata2) &&
+            exists(input$mydata2) && is.data.frame(get(input$mydata2)))
+            # eval(parse(text=input$mydata))
+            get(input$mydata2)
+    })
+
+    df=callModule(editableDT,"table1",data=reactive(data()))
 
     output$test=renderPrint({
          str(df())
     })
     #mydf<-editData::sampleData
-    df2=callModule(editableDT,"table2",dataname=reactive(input$mydata2))
+    df2=callModule(editableDT,"table2",data=data2)
     output$test2=renderPrint({
          str(df2())
     })
