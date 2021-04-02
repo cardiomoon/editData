@@ -27,8 +27,7 @@ server <- function(input, output) {
                 mylist[[3*i-2]]<-h2(title)
                 mylist[[3*i-1]]<-editableDTUI(uiname[[i]])
                 textname[[i]]=paste0("text",i)
-                downloadname[[i]]=paste0("download",i)
-                downloadname2[[i]]=paste0("downloadRDS",i)
+
                 mylist[[3*i]]<-verbatimTextOutput(textname[[i]])
 
 
@@ -40,20 +39,7 @@ server <- function(input, output) {
                      head(result[[j]]())
                     })
 
-                    output[[downloadname[[j]]]]=downloadHandler(
-                         filename=paste0(downloadname[[j]],".csv"),
-                         content=function(file){
-                              readr::write_csv(result[[j]](),file)
-                         },
-                         contentType="text/csv"
-                    )
-                    output[[downloadname2[[j]]]]=downloadHandler(
-                         filename=paste0(downloadname[[j]],".RDS"),
-                         content=function(file){
-                              saveRDS(result[[j]](),file)
-                         },
-                         contentType="text/RDS"
-                    )
+
                 })
             }
             colwidth=12/count

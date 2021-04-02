@@ -12,12 +12,11 @@ pickerInput3=function (...)
 #' @importFrom shiny NS
 #' @export
 #' @examples
-#'library(shiny)
 #'# Only run examples in interactive R sessions
 #'if (interactive()) {
 #' library(shiny)
 #' ui=fluidPage(
-#'   selectInput("select","select",choices=c("mtcars","iris","acs","radial","sampleData")),
+#'   selectInput("select","select",choices=c("mtcars","iris","sampleData")),
 #'   textInput("mydata","mydata",value="mtcars"),
 #'   hr(),
 #'   editableDTUI("editableDT"),
@@ -26,9 +25,7 @@ pickerInput3=function (...)
 #' )
 #' server=function(input,output,session){
 #'   data=reactive({
-#'        if (!is.null(input$mydata) && nzchar(input$mydata) &&
-#'            exists(input$mydata) && is.data.frame(get(input$mydata)))
-#'             get(input$mydata)
+#'             myget(input$mydata)
 #'   })
 #'   observeEvent(input$select,{
 #'        updateTextInput(session,"mydata",value=input$select)
@@ -332,7 +329,7 @@ editableDT=function(input,output,session,data){
           } else if(kind =="logical"){
                checkboxInput3(ns(id),label,value=value,width=width)
           } else {
-               if(max(nchar(data[[x]]))<100){
+               if(max(nchar(data[[x]]))<20){
                 textInput3(ns(id),label,value=value,width=width)
                } else{
                textAreaInput(ns(id),label,value=value)

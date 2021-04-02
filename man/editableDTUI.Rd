@@ -13,12 +13,11 @@ editableDTUI(id)
 UI of editableDT Shiny module
 }
 \examples{
-library(shiny)
 # Only run examples in interactive R sessions
 if (interactive()) {
 library(shiny)
 ui=fluidPage(
-  selectInput("select","select",choices=c("mtcars","iris","acs","radial","sampleData")),
+  selectInput("select","select",choices=c("mtcars","iris","sampleData")),
   textInput("mydata","mydata",value="mtcars"),
   hr(),
   editableDTUI("editableDT"),
@@ -27,9 +26,7 @@ ui=fluidPage(
 )
 server=function(input,output,session){
   data=reactive({
-       if (!is.null(input$mydata) && nzchar(input$mydata) &&
-           exists(input$mydata) && is.data.frame(get(input$mydata)))
-            get(input$mydata)
+            myget(input$mydata)
   })
   observeEvent(input$select,{
        updateTextInput(session,"mydata",value=input$select)

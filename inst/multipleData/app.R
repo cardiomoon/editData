@@ -19,9 +19,7 @@ server <- function(input, output) {
         if(count>0) {
             for(i in  1:count){
 
-
-
-                data[[i]]<-get(input$data[i])
+       data[[i]]<-get(input$data[i])
                 uiname[[i]]<-paste0("table",i)
                 title=paste0("File No:",i)
                 mylist[[3*i-2]]<-h2(title)

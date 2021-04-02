@@ -1,11 +1,12 @@
 library(shiny)
 library(editData)
 
-
 ui <- fluidPage(
+    h2("Data 1"),
     textInput("mydata","Enter data name",value="mtcars"),
     editableDTUI("table1"),
     verbatimTextOutput("test"),
+    h2("Data 2"),
     textInput("mydata2","Enter data name",value="sampleData"),
     editableDTUI("table2"),
     verbatimTextOutput("test2")
@@ -13,17 +14,11 @@ ui <- fluidPage(
 server <- function(input, output) {
 
     data=reactive({
-        if (!is.null(input$mydata) && nzchar(input$mydata) &&
-            exists(input$mydata) && is.data.frame(get(input$mydata)))
-            # eval(parse(text=input$mydata))
-            get(input$mydata)
+            myget(input$mydata)
     })
 
     data2=reactive({
-        if (!is.null(input$mydata2) && nzchar(input$mydata2) &&
-            exists(input$mydata2) && is.data.frame(get(input$mydata2)))
-            # eval(parse(text=input$mydata))
-            get(input$mydata2)
+            myget(input$mydata2)
     })
 
     df=callModule(editableDT,"table1",data=reactive(data()))

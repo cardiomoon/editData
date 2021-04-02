@@ -18,7 +18,7 @@ server <- function(input, output) {
 
         if(count>0) {
             for(i in  1:count){
-                data[[i]]<-readr::read_csv(input$file$datapath[i],comment="#")
+                data[[i]]<-myimport(input$file$datapath[i])
                 uiname[[i]]<-paste0("table",i)
                 title=paste0("File No:",i)
                 mylist[[3*i-2]]<-h2(title)

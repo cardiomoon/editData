@@ -38,10 +38,7 @@ editData=function(data=NULL,viewer="dialog",mode=2){
     if(any(class(data) %in% c("data.frame","tibble","tbl_df"))) {
         mydata=deparse(substitute(data))
     } else if(class(data) =="character") {
-
-        result<-tryCatch(eval(parse(text=data)),error=function(e) "error")
-        if(any(class(result) %in% c("data.frame","tibble","tbl_df"))) mydata=data
-        else  return(NULL)
+        mydata=data
     }
 
 
@@ -51,7 +48,7 @@ ui<-miniPage(
     fluidRow(
 
         column(6,
-    fileInput("file1","Upload CSV file"),
+    fileInput("file1","Upload File"),
     checkboxInput("strAsFactor","strings As Factor",value=FALSE)),
     column(6,
     textInput3("mydata","Or Enter data name",value=mydata,width=150,bg="lightcyan"))),
@@ -67,32 +64,19 @@ server=function(input,output,session){
     uploaded <-c()
 
     mydf=reactive({
-        validate(
-            need(any(class(try(eval(parse(text=input$mydata)))) %in% c("tbl_df","tibble","data.frame")),"Enter Valid Data Name"))
-        mydf=eval(parse(text=input$mydata))
-        mydf
+        myget(input$mydata)
     })
     df=callModule(editableDT,"table1",data=reactive(mydf()))
 
-    # output$test=renderPrint({
-    #     str(df())
-    # })
-
     observeEvent(input$file1,{
         if(!is.null(input$file1)) {
-            uploaded<<-read.csv(input$file1$datapath,stringsAsFactors = input$strAsFactor)
-            updateTextInput(session,"mydata",value="uploaded")
+            dataname=ifelse(input$mydata=="uploaded","uploaded1","uploaded")
+            assign(dataname,myimport(input$file1$datapath))
+            updateTextInput(session,"mydata",value=dataname)
         }
     })
 
 
-    # mydf<-editData::sampleData
-    #
-    # df2=callModule(editableDT,"table2",data=reactive(mydf))
-    #
-    # output$test2=renderPrint({
-    #     str(df2())
-    # })
     output$downloadData <- downloadHandler(
         filename = function() {
             paste("edited-",Sys.Date(),".csv", sep = "")
@@ -104,20 +88,9 @@ server=function(input,output,session){
 
     observeEvent(input$done, {
 
-        # if(nzchar(defaultData)) {
-        #     insertText(text=input$code)
-        #     stopApp()
-        # } else{
-        #     result <- eval(parse(text=input$code))
-        #     attr(result,"code") <- input$code
-        #     stopApp(result)
-        # }
+
         result=df()
-        # if(input$resultAs=="tibble"){
-        #     result<-as_tibble(result)
-        # } else{
-        #     result<-as.data.frame(result)
-        # }
+
         stopApp(result)
     })
 
