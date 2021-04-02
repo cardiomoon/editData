@@ -60,19 +60,26 @@ knitr::include_graphics("https://raw.githubusercontent.com/cardiomoon/editData/m
 You can enter data name(4) to edit, upload a CSV or excel or RDS file(5) and download the edited data as a csv(6) or xlsx(7) or RDS (8)file.
 
 
-4. If you press the edit button you can see this window. You can edit individual cell. You can delete the row or update the data. Or you can edit cell by double-click.
+4. If you press the edit button you can see this window. You can edit individual cell. You can delete the row or update the data. 
 
 ```{r,echo=FALSE}
 knitr::include_graphics("https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/4.png")
 ```
 
-5. By default, the `sampleData` included in the `editData` package is selected. The `sex` and `bloodType` column are `factor` variables. A `selectInput` is assigned for a column of class factor.
+5. Alternatively, you can edit a cell by double-click.
+
+```{r,echo=FALSE}
+knitr::include_graphics("https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/7.png")
+```
+
+
+6 By default, the `sampleData` included in the `editData` package is selected. The `sex` and `bloodType` column are `factor` variables. A `selectInput` is assigned for a column of class factor.
 
 ```{r,echo=FALSE}
 knitr::include_graphics("https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/5.png")
 ```
 
-6. A `dateInput` is assigend for a column of class `date`.
+7. A `dateInput` is assigend for a column of class `date`.
 
 ```{r,echo=FALSE}
 knitr::include_graphics("https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/6.png")

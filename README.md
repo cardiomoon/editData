@@ -57,11 +57,16 @@ You can enter data name(4) to edit, upload a CSV or excel or RDS file(5) and dow
 
 <img src="https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/4.png" title="plot of chunk unnamed-chunk-6" alt="plot of chunk unnamed-chunk-6" width="70%" style="display: block; margin: auto;" />
 
-5. By default, the `sampleData` included in the `editData` package is selected. The `sex` and `bloodType` column are `factor` variables. A `selectInput` is assigned for a column of class factor.
+5. Alternatively, you can edit a cell by double-click.
+
+<img src="https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/7.png" title="plot of chunk unnamed-chunk-7" alt="plot of chunk unnamed-chunk-7" width="70%" style="display: block; margin: auto;" />
+
+
+6. By default, the `sampleData` included in the `editData` package is selected. The `sex` and `bloodType` column are `factor` variables. A `selectInput` is assigned for a column of class factor.
 
 <img src="https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/5.png" title="plot of chunk unnamed-chunk-7" alt="plot of chunk unnamed-chunk-7" width="70%" style="display: block; margin: auto;" />
 
-6. A `dateInput` is assigend for a column of class `date`.
+7. A `dateInput` is assigend for a column of class `date`.
 
 <img src="https://raw.githubusercontent.com/cardiomoon/editData/master/man/figures/6.png" title="plot of chunk unnamed-chunk-8" alt="plot of chunk unnamed-chunk-8" width="70%" style="display: block; margin: auto;" />
 
