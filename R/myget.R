@@ -5,8 +5,11 @@
 #' myget("iris")
 #' myget("mtcars")
 myget=function(x){
+
      if (!is.null(x) && nzchar(x) &&
          exists(x) && is.data.frame(get(x))) {
           get(x)
+     } else{
+          NULL
      }
 }

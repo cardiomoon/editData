@@ -20,7 +20,8 @@
 #' }
 editData=function(data=NULL,viewer="dialog",mode=2){
 
-    data("sampleData",package="editData",envir=environment())
+    # data("sampleData",package="editData",envir=environment())
+    data("sampleData",package="editData")
     context <- rstudioapi::getActiveDocumentContext()
 
     # Set the default data to use based on the selection.
@@ -53,6 +54,7 @@ ui<-miniPage(
     column(6,
     textInput3("mydata","Or Enter data name",value=mydata,width=150,bg="lightcyan"))),
     editableDTUI("table1")
+
 ))
 
 server=function(input,output,session){
@@ -61,30 +63,34 @@ server=function(input,output,session){
           attachNamespace("tidyverse")
      }
 
-    uploaded <-c()
+    RV=reactiveValues()
 
-    mydf=reactive({
-        myget(input$mydata)
-    })
-    df=callModule(editableDT,"table1",data=reactive(mydf()))
+    observeEvent(input$mydata,
+                 RV$df<-myget(input$mydata))
+
+    df=callModule(editableDT,"table1",data=reactive(RV$df))
 
     observeEvent(input$file1,{
         if(!is.null(input$file1)) {
-            dataname=ifelse(input$mydata=="uploaded","uploaded1","uploaded")
-            assign(dataname,myimport(input$file1$datapath))
-            updateTextInput(session,"mydata",value=dataname)
+            # dataname=ifelse(input$mydata=="uploaded","uploaded1","uploaded")
+            if(input$mydata!="uploaded"){
+                uploaded<<-myimport(input$file1$datapath)
+                updateTextInput(session,"mydata",value="uploaded")
+                # RV$df<-myimport(input$file1$datapath)
+
+            } else{
+                uploaded1<<-myimport(input$file1$datapath)
+                updateTextInput(session,"mydata",value="uploaded1")
+            }
+
         }
     })
 
+    # output$text1=renderPrint({
+    #     str(RV$df)
+    #
+    # })
 
-    output$downloadData <- downloadHandler(
-        filename = function() {
-            paste("edited-",Sys.Date(),".csv", sep = "")
-        },
-        content = function(file) {
-            write.csv(df(), file, row.names = FALSE)
-        }
-    )
 
     observeEvent(input$done, {
 
