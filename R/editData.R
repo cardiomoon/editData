@@ -49,8 +49,8 @@ ui<-miniPage(
     fluidRow(
 
         column(6,
-    fileInput("file1","Upload File"),
-    checkboxInput("strAsFactor","strings As Factor",value=FALSE)),
+    fileInput("file1","Upload File")),
+
     column(6,
     textInput3("mydata","Or Enter data name",value=mydata,width=150,bg="lightcyan"))),
     editableDTUI("table1")
