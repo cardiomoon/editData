@@ -1,0 +1,12 @@
+name: editData
+title: editData
+username:
+account: cardiomoon
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3905474
+bundleId: 4427296
+url: https://cardiomoon.shinyapps.io/editData/
+when: 1617458539.27252
+asMultiple: FALSE
+asStatic: FALSE

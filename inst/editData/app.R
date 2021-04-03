@@ -1,6 +1,15 @@
 library(shiny)
-library(miniUI)
 library(editData)
+library(rio)
+library(openxlsx)
+library(miniUI)
+library(rstudioapi)
+library(DT)
+library(tibble)
+library(dplyr)
+library(shinyWidgets)
+
+options(shiny.sanitize.errors = FALSE)
 
 ui<-miniPage(
      gadgetTitleBar("editable DataTable"),
@@ -18,9 +27,9 @@ ui<-miniPage(
 
 server=function(input,output,session){
 
-     if(!isNamespaceLoaded("tidyverse")){
-          attachNamespace("tidyverse")
-     }
+     # if(!isNamespaceLoaded("tidyverse")){
+     #      attachNamespace("tidyverse")
+     # }
 
      RV=reactiveValues()
 
