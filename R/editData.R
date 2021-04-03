@@ -7,7 +7,7 @@
 #' @importFrom utils read.csv str write.csv
 #' @importFrom shiny stopApp callModule runGadget column fileInput downloadButton renderPrint
 #'  observeEvent tagList uiOutput browserViewer dialogViewer downloadHandler h4 hr paneViewer
-#'  checkboxInput need validate
+#'  checkboxInput need validate reactiveValues
 #' @return A manipulated 'data.frame' or NULL
 #' @export
 #' @examples
@@ -21,7 +21,7 @@
 editData=function(data=NULL,viewer="dialog",mode=2){
 
     # data("sampleData",package="editData",envir=environment())
-    data("sampleData",package="editData")
+    data("sampleData",package="editData",envir=environment())
     context <- rstudioapi::getActiveDocumentContext()
 
     # Set the default data to use based on the selection.
@@ -72,16 +72,18 @@ server=function(input,output,session){
 
     observeEvent(input$file1,{
         if(!is.null(input$file1)) {
-            # dataname=ifelse(input$mydata=="uploaded","uploaded1","uploaded")
-            if(input$mydata!="uploaded"){
-                uploaded<<-myimport(input$file1$datapath)
-                updateTextInput(session,"mydata",value="uploaded")
-                # RV$df<-myimport(input$file1$datapath)
-
-            } else{
-                uploaded1<<-myimport(input$file1$datapath)
-                updateTextInput(session,"mydata",value="uploaded1")
-            }
+             dataname=ifelse(input$mydata=="uploaded","uploaded1","uploaded")
+             updateTextInput(session,"mydata",value=dataname)
+             assign(dataname,myimport(input$file1$datapath))
+            # if(input$mydata!="uploaded"){
+            #     uploaded<<-myimport(input$file1$datapath)
+            #     updateTextInput(session,"mydata",value="uploaded")
+            #     # RV$df<-myimport(input$file1$datapath)
+            #
+            # } else{
+            #     uploaded1<<-myimport(input$file1$datapath)
+            #     updateTextInput(session,"mydata",value="uploaded1")
+            # }
 
         }
     })
