@@ -11,7 +11,7 @@ ui<-miniPage(
                       fileInput("file1","Upload File")),
 
                column(6,
-                      textInput3("mydata","Or Enter data name",value="sampleData",width=150,bg="lightcyan"))),
+                      textInput3("mydata","Or Enter data name",value="mtcars",width=150,bg="lightcyan"))),
           editableDTUI("table1")
 
      ))
@@ -65,6 +65,6 @@ server=function(input,output,session){
      })
 }
 
-myviewer <- dialogViewer("editData", width = 1000, height = 800)
-runGadget(ui, server, viewer = myviewer)
+# myviewer <- dialogViewer("editData", width = 1000, height = 800)
+shinyApp(ui, server)
 
