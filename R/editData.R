@@ -54,36 +54,49 @@ ui<-miniPage(
     column(6,
     textInput3("mydata","Or Enter data name",value=mydata,width=150,bg="lightcyan"))),
     editableDTUI("table1")
+    #,verbatimTextOutput("text1")
 
 ))
 
 server=function(input,output,session){
 
-     if(!isNamespaceLoaded("tidyverse")){
-          attachNamespace("tidyverse")
-     }
+     # if(!isNamespaceLoaded("tidyverse")){
+     #      attachNamespace("tidyverse")
+     # }
 
     RV=reactiveValues()
+    uploaded<-uploaded1<-c()
 
-    observeEvent(input$mydata,
-                 RV$df<-myget(input$mydata))
+    observeEvent(input$mydata,{
+        x=input$mydata
+        if(!is.null(x) && nzchar(x) &&
+            exists(x) && is.data.frame(get(x))) {
+        RV$df<-get(x)}
+        else {
+            NULL
+        }
+
+     })
 
     df=callModule(editableDT,"table1",data=reactive(RV$df))
 
     observeEvent(input$file1,{
         if(!is.null(input$file1)) {
-             dataname=ifelse(input$mydata=="uploaded","uploaded1","uploaded")
-             updateTextInput(session,"mydata",value=dataname)
-             assign(dataname,myimport(input$file1$datapath))
-            # if(input$mydata!="uploaded"){
-            #     uploaded<<-myimport(input$file1$datapath)
-            #     updateTextInput(session,"mydata",value="uploaded")
-            #     # RV$df<-myimport(input$file1$datapath)
-            #
-            # } else{
-            #     uploaded1<<-myimport(input$file1$datapath)
-            #     updateTextInput(session,"mydata",value="uploaded1")
-            # }
+             # data1=myimport(input$file1$datapath)
+             # dataname=ifelse(input$mydata=="uploaded","uploaded1","uploaded")
+             # assign(dataname,data1,envir=environment())
+             # updateTextInput(session,"mydata",value=dataname)
+             # RV$df<-data1
+
+            if(input$mydata!="uploaded"){
+                uploaded<<-myimport(input$file1$datapath)
+                updateTextInput(session,"mydata",value="uploaded")
+                # RV$df<-myimport(input$file1$datapath)
+
+            } else{
+                uploaded1<<-myimport(input$file1$datapath)
+                updateTextInput(session,"mydata",value="uploaded1")
+            }
 
         }
     })

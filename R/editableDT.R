@@ -327,12 +327,16 @@ editableDT=function(input,output,session,data){
           } else if(kind =="Date"){
                dateInput3(ns(id),label,value=value,width=width)
           } else if(kind =="logical"){
+              if(is.na(value)) value=FALSE
                checkboxInput3(ns(id),label,value=value,width=width)
           } else {
-               if(max(nchar(data[[x]]))<20){
-                textInput3(ns(id),label,value=value,width=width)
-               } else{
-               textAreaInput(ns(id),label,value=value)
+              if(is.na(value)) value=""
+              if(is.na(max(nchar(data[[x]]),na.rm=TRUE))){
+                  textInput3(ns(id),label,value=value,width=width)
+              } else if(max(nchar(data[[x]]),na.rm=TRUE)<20){
+                  textInput3(ns(id),label,value=value,width=width)
+              } else{
+               textAreaInput(ns(id),label,value=value,width="460px")
                }
           }
 
