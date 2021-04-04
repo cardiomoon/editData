@@ -1,3 +1,9 @@
+# editData 0.1.9 
+=================
+(2021-4-4)
+
+* New shiny module functions "editableDT2UI" and "editableDT2" added. These module are  for data with lots of columns and large string length.
+
 # editData 0.1.8.1
 ==================
 (2021-4-3)

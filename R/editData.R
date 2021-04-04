@@ -1,7 +1,7 @@
 #' A shiny app for editing a 'data.frame'
 #' @param data A tibble or a tbl_df or a data.frame to manipulate
 #' @param viewer Specify where the gadget should be displayed. Possible choices are c("dialog","browser","pane")
-#' @param mode An integer
+#' @param length Numeric desired maximum length of string
 #' @importFrom rstudioapi getActiveDocumentContext
 #' @importFrom miniUI miniPage gadgetTitleBar miniContentPanel
 #' @importFrom utils read.csv str write.csv
@@ -18,7 +18,7 @@
 #'     result<-editData(mtcars)
 #'     result
 #' }
-editData=function(data=NULL,viewer="dialog",mode=2){
+editData=function(data=NULL,viewer="dialog",length=50){
 
     # data("sampleData",package="editData",envir=environment())
     data("sampleData",package="editData",envir=environment())
@@ -53,32 +53,48 @@ ui<-miniPage(
 
     column(6,
     textInput3("mydata","Or Enter data name",value=mydata,width=150,bg="lightcyan"))),
-    editableDTUI("table1")
+    uiOutput("DTUI")
+
     #,verbatimTextOutput("text1")
 
 ))
 
-server=function(input,output,session){
+server=function(input,output,session,length=length){
 
      # if(!isNamespaceLoaded("tidyverse")){
      #      attachNamespace("tidyverse")
      # }
 
-    RV=reactiveValues()
+    RV=reactiveValues(df=c(),mode=1)
     uploaded<-uploaded1<-c()
 
     observeEvent(input$mydata,{
         x=input$mydata
         if(!is.null(x) && nzchar(x) &&
             exists(x) && is.data.frame(get(x))) {
-        RV$df<-get(x)}
-        else {
-            NULL
+            RV$df<-get(x)
+
+        } else {
+            RV$df<-NULL
         }
+
 
      })
 
-    df=callModule(editableDT,"table1",data=reactive(RV$df))
+
+    output$DTUI=renderUI({
+
+           editableDT2UI("table1")
+
+    })
+
+
+
+    df=callModule(editableDT2,"table1",data=reactive(RV$df))
+
+    # df2=callModule(editableDT2,"table2",data=reactive(RV$df))
+
+
 
     observeEvent(input$file1,{
         if(!is.null(input$file1)) {

@@ -4,14 +4,14 @@
 \alias{editData}
 \title{A shiny app for editing a 'data.frame'}
 \usage{
-editData(data = NULL, viewer = "dialog", mode = 2)
+editData(data = NULL, viewer = "dialog", length = 50)
 }
 \arguments{
 \item{data}{A tibble or a tbl_df or a data.frame to manipulate}
 
 \item{viewer}{Specify where the gadget should be displayed. Possible choices are c("dialog","browser","pane")}
 
-\item{mode}{An integer}
+\item{length}{Numeric desired maximum length of string}
 }
 \value{
 A manipulated 'data.frame' or NULL
