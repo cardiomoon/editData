@@ -4,7 +4,34 @@
 #' @export
 pickerInput3=function (...)
 {
-     div(style = "display:inline-block;", pickerInput(...))
+    div(style = "display:inline-block;", pickerInput(...))
+}
+
+
+#' Calculate maximal length
+#' @param x A vector
+#' @export
+#' @examples
+#' maxLength(month.name)
+maxLength=function(x){
+    if(is.character(x)){
+        max(nchar(x),na.rm=TRUE)
+    } else{
+        1
+    }
+}
+
+#' Truncate string to desired length
+#' @param x A vector
+#' @param length numeric desired string length
+#' @export
+makeShort=function(x,length=50){
+    if(is.character(x)){
+        select<-nchar(x,keepNA=FALSE)>length
+        select
+        x[select]<-paste0(substr(x[select],1,length),"...")
+    }
+    x
 }
 
 #' UI of editableDT Shiny module
@@ -50,23 +77,75 @@ editableDTUI=function(id){
 #' @param output output
 #' @param session session
 #' @param data A reactive data object
+#' @param length numeric desired length
 #' @importFrom DT DTOutput renderDT dataTableProxy datatable replaceData
 #' @importFrom openxlsx write.xlsx
 #' @importFrom shiny br span reactiveVal actionButton fluidRow icon modalButton modalDialog
-#' reactive removeModal renderUI showModal textAreaInput updateTextInput
+#' reactive removeModal renderUI showModal textAreaInput updateTextInput isolate conditionalPanel
+#' numericInput verbatimTextOutput
+#' @importFrom shinyWidgets dropdownButton tooltipOptions checkboxGroupButtons awesomeCheckbox
+#' updateCheckboxGroupButtons
 #' @export
-editableDT=function(input,output,session,data){
+editableDT=function(input,output,session,data,length=50){
 
      ns <- session$ns
 
      df1<-reactiveVal()
 
+     finalDf<-reactiveVal()
+
+     RV=reactiveValues(cols=1:7,editable=FALSE)
+
+     shortdata=reactive({
+          input$Refresh
+         data1<-data()
+          result=as.data.frame(lapply(data1[RV$cols],makeShort,isolate(input$length)))
+          rownames(result)=rownames(data1)
+          if(identical(RV$cols,1:ncol(data1))&(max(sapply(data1,maxLength),na.rm=TRUE)<length)) {
+              RV$editable=TRUE
+          } else{
+              RV$editable=FALSE
+          }
+          result
+     })
+
      observeEvent(data(),{
-          df1(data())
+         if(ncol(data())<7) {
+             RV$cols=1:ncol(data())
+         } else{
+             RV$cols=1:7
+         }
+         df1(shortdata())
+         finalDf(data())
      })
 
      output$editableDTModule=renderUI({
+          no=ncol(data())
+          selected=intersect(1:no,RV$cols)
+
           tagList(
+               dropdownButton(
+               checkboxGroupButtons(ns("checkgroup"),"Select Columns to be displayed",
+                                    #status = "primary",
+                                    selected=selected,
+                                    checkIcon = list(
+                                        yes = icon("ok",
+                                                   lib = "glyphicon"),
+                                        no = icon("remove",
+                                                  lib = "glyphicon")),
+                                           choiceNames=names(data()),
+                                         choiceValues=1:no
+                                 ),
+               actionButton(ns("selectAll"),"select all columns"),
+               numericInput(ns("length"),"Desired maximum length of cells",value=length),
+               #p("caution : All change will be ignored !"),
+               div(style = "display:inline-block;",
+                   actionButton(ns("Refresh"),"Apply Selected Columns and Length",class = "btn-info"),
+                   span(style="color:red", "Caution : All changes will be ignored !")),
+               circle=TRUE,status="info",icon = icon("gear"),width="600px",
+               tooltip=tooltipOptions(title="Customize Table")
+               ),
+               br(),
                actionButton(ns("delete"),"Delete",icon=icon("trash-alt")),
                actionButton(ns("reset"),"Restore",icon=icon("trash-restore")),
                actionButton(ns("edit"),"Edit",icon=icon("pen-fancy")),
@@ -74,20 +153,36 @@ editableDT=function(input,output,session,data){
                actionButton(ns("insert"),"Insert",icon=icon("search-plus")),
                actionButton(ns("deleteAll"),"Delete All",icon=icon("minus-square")),
                br(),
-               checkboxInput(ns("confirm"),"Confirm delete or restore",value=TRUE),
+               br(),
+               awesomeCheckbox(ns("confirm"),"Confirm delete or restore",value=TRUE),
                DTOutput(ns("table")),
                downloadButton(ns("downloadData"), "download as CSV",icon=icon("file-csv")),
                downloadButton(ns("downloadExcel"), "download as Excel",icon=icon("file-excel")),
-               downloadButton(ns("downloadRDS"), "download as RDS")
+               downloadButton(ns("downloadRDS"), "download as RDS"),
+               hr()
                # ,verbatimTextOutput(ns("test1"))
           )
      })
 
-     output$test1=renderPrint({
-          cat("This is in module\n")
-          str(data())
-          str(df1())
+     observeEvent(input$selectAll,{
+         updateCheckboxGroupButtons(session,"checkgroup",selected=1:ncol(data()))
      })
+
+     observeEvent(input$Refresh,{
+         RV$cols<-as.integer(input$checkgroup)
+         df1(shortdata())
+         finalDf(data())
+     })
+
+     # output$test1=renderPrint({
+     #     cat("finalDf()\n")
+     #     str(finalDf())
+     #     cat("df1()\n")
+     #     str(df1())
+     #     cat("shortdata()\n")
+     #     str(shortdata())
+     #
+     # })
 
      observeEvent(input$resetOk,{
           restoreData()
@@ -96,7 +191,8 @@ editableDT=function(input,output,session,data){
 
 
      output$table <- renderDT({
-          datatable(data(), editable = "cell",
+          datatable(shortdata(),
+                    editable=RV$editable,
                     options=list(
                          pageLength=10
                     ))
@@ -104,18 +200,7 @@ editableDT=function(input,output,session,data){
 
      proxy = dataTableProxy('table')
 
-     observeEvent(input$table_cell_edit, {
-          info=input$table_cell_edit
 
-          i=info$row
-          j=info$col
-          v=info$value
-
-          newdf <- df1()
-          newdf[i,j]<-DT::coerceValue(v, newdf[i, j])
-
-          df1(newdf)
-     })
      observeEvent(input$delete,{
           if(!input$confirm){
                deleteSelected()
@@ -159,6 +244,24 @@ editableDT=function(input,output,session,data){
           }
      })
 
+     observeEvent(input$table_cell_edit, {
+          info=input$table_cell_edit
+
+          i=info$row
+          j=info$col
+          v=info$value
+
+          newdf <- df1()
+          newdf[i,j]<-DT::coerceValue(v, newdf[i, j])
+          df1(newdf)
+          replaceData(proxy,df1(),resetPaging=FALSE)
+          newdf2<-finalDf()
+          newdf2[i,j]<-DT::coerceValue(v, newdf2[i, j])
+          finalDf(newdf2)
+
+
+     })
+
      deleteSelected=function(){
           i= input$table_rows_selected
 
@@ -167,11 +270,15 @@ editableDT=function(input,output,session,data){
                newdf <- newdf[-i,]
                df1(newdf)
                replaceData(proxy,df1(),resetPaging=FALSE)
+               newdf2<-finalDf()
+               newdf2 <- newdf2[-i,]
+               finalDf(newdf2)
           }
      }
      restoreData=function(){
-          df1(data())
+          df1(shortdata())
           replaceData(proxy,df1(),resetPaging=FALSE)
+          finalDf(data())
      }
 
      observeEvent(input$deleteOk,{
@@ -183,6 +290,9 @@ editableDT=function(input,output,session,data){
           newdf=newdf[0,]
           df1(newdf)
           replaceData(proxy,df1(),resetPaging=FALSE)
+          newdf2=finalDf()
+          newdf2=newdf2[0,]
+          finalDf(newdf2)
           removeModal()
      })
 
@@ -190,10 +300,10 @@ editableDT=function(input,output,session,data){
           i= input$table_rows_selected
           if(length(i)>0){
                i= input$table_rows_selected[1]
-               result=data2input(df1(),i)
+               result=data2input(finalDf(),i)
                showModal(modalDialog(
                     do.call(tagList,result),
-                    title=paste0(i,"/",nrow(df1())),
+                    title=paste0(i,"/",nrow(finalDf())),
                     footer = tagList(
                          modalButton("Cancel"),
                          actionButton(ns("update"), "update",icon=icon("save"))
@@ -206,7 +316,7 @@ editableDT=function(input,output,session,data){
      observeEvent(input$add,{
 
                i= nrow(df1())+1
-               result=data2input(df1(),i)
+               result=data2input(finalDf(),i)
                showModal(modalDialog(
                     do.call(tagList,result),
                     title=paste0(i,"/",nrow(df1())),
@@ -223,7 +333,7 @@ editableDT=function(input,output,session,data){
 
           i= input$table_rows_selected
           if(length(i)==1){
-          result=data2input(df1(),i)
+          result=data2input(finalDf(),i)
           showModal(modalDialog(
                do.call(tagList,result),
                title=paste0(i,"/",nrow(df1())),
@@ -242,57 +352,82 @@ editableDT=function(input,output,session,data){
           i= input$table_rows_selected[1]
           for(j in 1:ncol(df1())){
 
-               newdf <- df1()
-               newdf[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf[i, j])
+              newdf2 <- finalDf()
+              newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
+              finalDf(newdf2)
 
-               df1(newdf)
-               replaceData(proxy,df1(),resetPaging=FALSE)
+              # result=as.data.frame(lapply(finalDf(),makeShort,length))
+              # rownames(result)=rownames(finalDf())
+              # newdf=result[RV$cols]
+              # df1(newdf)
+
+              newdf=df1()
+              temp=as.data.frame(lapply(finalDf()[i,],makeShort,length))
+              newdf[i,]=temp[RV$cols]
+              df1(newdf)
+              replaceData(proxy,df1(),resetPaging=FALSE)
+
           }
           removeModal()
      })
 
      observeEvent(input$addOk,{
-          newdf=df1()
-          newdf<-rbind(newdf,newdf[nrow(newdf),])
-          i=nrow(newdf)
-          for(j in 1:ncol(df1())){
+          # newdf2 <- finalDf()
+          # newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
+          # finalDf(newdf2)
 
-               newdf <- df1()
-               newdf[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf[i, j])
+          newdf2=finalDf()
+          newdf2<-rbind(newdf2,newdf2[nrow(newdf2),])
+          i=nrow(newdf2)
 
-               df1(newdf)
-               replaceData(proxy,df1(),resetPaging=FALSE)
+          newdf2 <- finalDf()
+          for(j in 1:ncol(finalDf())){
+
+
+               newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
           }
+          finalDf(newdf2)
+
+          result=as.data.frame(lapply(finalDf(),makeShort,length))
+          rownames(result)=rownames(finalDf())
+          newdf=result[RV$cols]
+          df1(newdf)
+          replaceData(proxy,df1(),resetPaging=FALSE)
           removeModal()
      })
 
      observeEvent(input$insertUp,{
           i= input$table_rows_selected
-          newdf=df1()
-          newdf<-rbind(newdf[1:i,],newdf[i:nrow(newdf),])
+          newdf2=finalDf()
+          newdf2<-rbind(newdf2[1:i,],newdf2[i:nrow(newdf2),])
 
-          for(j in 1:ncol(df1())){
-
-               newdf[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf[i, j])
-
-               df1(newdf)
-               replaceData(proxy,df1(),resetPaging=FALSE)
+          for(j in 1:ncol(finalDf())){
+               newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
           }
+          finalDf(newdf2)
+          result=as.data.frame(lapply(finalDf(),makeShort,length))
+          rownames(result)=rownames(finalDf())
+          newdf=result[RV$cols]
+          df1(newdf)
+          replaceData(proxy,df1(),resetPaging=FALSE)
           removeModal()
      })
      observeEvent(input$insertDown,{
-          i= input$table_rows_selected
-          newdf=df1()
-          newdf<-rbind(newdf[1:i,],newdf[i:nrow(newdf),])
-          i=i+1
-          for(j in 1:ncol(df1())){
+         i= input$table_rows_selected
+         newdf2=finalDf()
+         newdf2<-rbind(newdf2[1:i,],newdf2[i:nrow(newdf2),])
+         i=i+1
+         for(j in 1:ncol(finalDf())){
+             newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
+         }
+         finalDf(newdf2)
+         result=as.data.frame(lapply(finalDf(),makeShort,length))
+         rownames(result)=rownames(finalDf())
+         newdf=result[RV$cols]
+         df1(newdf)
+         replaceData(proxy,df1(),resetPaging=FALSE)
+         removeModal()
 
-               newdf[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf[i, j])
-
-               df1(newdf)
-               replaceData(proxy,df1(),resetPaging=FALSE)
-          }
-          removeModal()
      })
 
      data2input=function(data,row){
@@ -331,12 +466,13 @@ editableDT=function(input,output,session,data){
                checkboxInput3(ns(id),label,value=value,width=width)
           } else {
               if(is.na(value)) value=""
-              if(is.na(max(nchar(data[[x]]),na.rm=TRUE))){
+              length1=nchar(data[[x]][row],keepNA=FALSE)
+              if(is.na(length1)){
                   textInput3(ns(id),label,value=value,width=width)
-              } else if(max(nchar(data[[x]]),na.rm=TRUE)<20){
+              } else if(length1<20){
                   textInput3(ns(id),label,value=value,width=width)
               } else{
-               textAreaInput(ns(id),label,value=value,width="460px")
+               textAreaInput(ns(id),label,value=value,width="460px",rows=1+length1/60)
                }
           }
 
@@ -348,7 +484,7 @@ editableDT=function(input,output,session,data){
                "mydata.csv"
           },
           content = function(file) {
-               write.csv(df1(), file, row.names = FALSE)
+               write.csv(finalDf(), file, row.names = FALSE)
           }
      )
 
@@ -357,7 +493,7 @@ editableDT=function(input,output,session,data){
                "mydata.xlsx"
           },
           content = function(file) {
-               write.xlsx(df1(), file,asTable=TRUE)
+               write.xlsx(finalDf(), file,asTable=TRUE)
           }
      )
      output$downloadRDS <- downloadHandler(
@@ -365,10 +501,10 @@ editableDT=function(input,output,session,data){
                "mydata.RDS"
           },
           content = function(file) {
-               saveRDS(df1(), file)
+               saveRDS(finalDf(), file)
           }
      )
 
-    return(reactive(df1()))
+    return(reactive(finalDf()))
 
 }

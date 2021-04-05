@@ -53,7 +53,7 @@ ui<-miniPage(
 
     column(6,
     textInput3("mydata","Or Enter data name",value=mydata,width=150,bg="lightcyan"))),
-    uiOutput("DTUI")
+    editableDTUI("table1")
 
     #,verbatimTextOutput("text1")
 
@@ -82,18 +82,7 @@ server=function(input,output,session,length=length){
      })
 
 
-    output$DTUI=renderUI({
-
-           editableDT2UI("table1")
-
-    })
-
-
-
-    df=callModule(editableDT2,"table1",data=reactive(RV$df))
-
-    # df2=callModule(editableDT2,"table2",data=reactive(RV$df))
-
+    df=callModule(editableDT,"table1",data=reactive(RV$df))
 
 
     observeEvent(input$file1,{
