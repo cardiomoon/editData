@@ -72,7 +72,7 @@ editableDT2UI=function(id){
 #' @importFrom openxlsx write.xlsx
 #' @importFrom shiny br span reactiveVal actionButton fluidRow icon modalButton modalDialog
 #' reactive removeModal renderUI showModal textAreaInput updateTextInput isolate conditionalPanel
-#' numericInput
+#' numericInput verbatimTextOutput
 #' @importFrom shinyWidgets dropdownButton tooltipOptions checkboxGroupButtons awesomeCheckbox
 #' @export
 editableDT2=function(input,output,session,data,length=50){
@@ -83,12 +83,18 @@ editableDT2=function(input,output,session,data,length=50){
 
      finalDf<-reactiveVal()
 
-     RV=reactiveValues(cols=1:7)
+     RV=reactiveValues(cols=1:7,editable=FALSE)
 
      shortdata=reactive({
           input$Refresh
-          result=as.data.frame(lapply(data()[RV$cols],makeShort,isolate(input$length)))
-          rownames(result)=rownames(data())
+         data1<-data()
+          result=as.data.frame(lapply(data1[RV$cols],makeShort,isolate(input$length)))
+          rownames(result)=rownames(data1)
+          if(identical(RV$cols,1:ncol(data1))&(max(sapply(data1,maxLength),na.rm=TRUE)<length)) {
+              RV$editable=TRUE
+          } else{
+              RV$editable=FALSE
+          }
           result
      })
 
@@ -139,7 +145,7 @@ editableDT2=function(input,output,session,data,length=50){
                downloadButton(ns("downloadExcel"), "download as Excel",icon=icon("file-excel")),
                downloadButton(ns("downloadRDS"), "download as RDS"),
                hr()
-              # ,verbatimTextOutput(ns("test1"))
+               ,verbatimTextOutput(ns("test1"))
           )
      })
 
@@ -147,13 +153,13 @@ editableDT2=function(input,output,session,data,length=50){
          RV$cols<-as.integer(input$checkgroup)
      })
 
-     # output$test1=renderPrint({
-     #     cat("RV$cols\n")
-     #     str(RV$cols)
-     #     cat("input$checkgroup\n")
-     #     str(input$checkgroup)
-     #     str(data()[RV$cols])
-     # })
+     output$test1=renderPrint({
+         cat("finalDf()\n")
+         str(finalDf())
+         # cat("df1()\n")
+         # str(df1())
+
+     })
 
      observeEvent(input$resetOk,{
           restoreData()
@@ -163,6 +169,7 @@ editableDT2=function(input,output,session,data,length=50){
 
      output$table <- renderDT({
           datatable(shortdata(),
+                    editable=RV$editable,
                     options=list(
                          pageLength=10
                     ))
@@ -170,18 +177,7 @@ editableDT2=function(input,output,session,data,length=50){
 
      proxy = dataTableProxy('table')
 
-     # observeEvent(input$table_cell_edit, {
-     #      info=input$table_cell_edit
-     #
-     #      i=info$row
-     #      j=info$col
-     #      v=info$value
-     #
-     #      newdf <- df1()
-     #      newdf[i,j]<-DT::coerceValue(v, newdf[i, j])
-     #
-     #      df1(newdf)
-     # })
+
      observeEvent(input$delete,{
           if(!input$confirm){
                deleteSelected()
@@ -223,6 +219,24 @@ editableDT2=function(input,output,session,data,length=50){
                                       easyClose=TRUE
                ))
           }
+     })
+
+     observeEvent(input$table_cell_edit, {
+          info=input$table_cell_edit
+
+          i=info$row
+          j=info$col
+          v=info$value
+
+          newdf <- df1()
+          newdf[i,j]<-DT::coerceValue(v, newdf[i, j])
+          df1(newdf)
+          replaceData(proxy,df1(),resetPaging=FALSE)
+          newdf2<-finalDf()
+          newdf2[i,j]<-DT::coerceValue(v, newdf2[i, j])
+          finalDf(newdf2)
+
+
      })
 
      deleteSelected=function(){

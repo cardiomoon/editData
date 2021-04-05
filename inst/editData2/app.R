@@ -12,7 +12,7 @@ library(shinyWidgets)
 options(shiny.sanitize.errors = FALSE)
 
 ui<-miniPage(
-     gadgetTitleBar("editable DataTable for large data"),
+     gadgetTitleBar("editable DataTable"),
      miniContentPanel(
           fluidRow(
 
