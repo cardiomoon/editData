@@ -72,7 +72,8 @@ editableDT2UI=function(id){
 #' @importFrom openxlsx write.xlsx
 #' @importFrom shiny br span reactiveVal actionButton fluidRow icon modalButton modalDialog
 #' reactive removeModal renderUI showModal textAreaInput updateTextInput isolate conditionalPanel
-#' checkboxGroupInput numericInput
+#' numericInput
+#' @importFrom shinyWidgets dropdownButton tooltipOptions checkboxGroupButtons awesomeCheckbox
 #' @export
 editableDT2=function(input,output,session,data,length=50){
 
@@ -87,6 +88,7 @@ editableDT2=function(input,output,session,data,length=50){
      shortdata=reactive({
           input$Refresh
           result=as.data.frame(lapply(data()[RV$cols],makeShort,isolate(input$length)))
+          rownames(result)=rownames(data())
           result
      })
 
@@ -103,17 +105,26 @@ editableDT2=function(input,output,session,data,length=50){
      output$editableDTModule=renderUI({
           no=ncol(data())
           selected=intersect(1:no,RV$cols)
+
           tagList(
-               checkboxInput(ns("customize"),"Customize Table",value=FALSE),
-               conditionalPanel(condition=sprintf("input[['%s']]==true",ns("customize")),
-               checkboxGroupInput(ns("checkgroup"),"Select Columns to be displayed",
-                                 selected=selected,
-                                 inline=TRUE,
-                                 choiceNames=names(data()),
-                                 choiceValues=1:no),
+               dropdownButton(
+               checkboxGroupButtons(ns("checkgroup"),"Select Columns to be displayed",
+                                    #status = "primary",
+                                    selected=selected,
+                                    checkIcon = list(
+                                        yes = icon("ok",
+                                                   lib = "glyphicon"),
+                                        no = icon("remove",
+                                                  lib = "glyphicon")),
+                                           choiceNames=names(data()),
+                                         choiceValues=1:no
+                                 ),
                numericInput(ns("length"),"Desired maximum length of cells",value=length),
-               actionButton(ns("Refresh"),"Apply Selected Columns and Length"),
-               hr()),
+               actionButton(ns("Refresh"),"Apply Selected Columns and Length",class = "btn-info"),
+               circle=TRUE,status="info",icon = icon("gear"),width="600px",
+               tooltip=tooltipOptions(title="Customize Table")
+               ),
+               br(),
                actionButton(ns("delete"),"Delete",icon=icon("trash-alt")),
                actionButton(ns("reset"),"Restore",icon=icon("trash-restore")),
                actionButton(ns("edit"),"Edit",icon=icon("pen-fancy")),
@@ -121,11 +132,13 @@ editableDT2=function(input,output,session,data,length=50){
                actionButton(ns("insert"),"Insert",icon=icon("search-plus")),
                actionButton(ns("deleteAll"),"Delete All",icon=icon("minus-square")),
                br(),
-               checkboxInput(ns("confirm"),"Confirm delete or restore",value=TRUE),
+               br(),
+               awesomeCheckbox(ns("confirm"),"Confirm delete or restore",value=TRUE),
                DTOutput(ns("table")),
                downloadButton(ns("downloadData"), "download as CSV",icon=icon("file-csv")),
                downloadButton(ns("downloadExcel"), "download as Excel",icon=icon("file-excel")),
-               downloadButton(ns("downloadRDS"), "download as RDS")
+               downloadButton(ns("downloadRDS"), "download as RDS"),
+               hr()
               # ,verbatimTextOutput(ns("test1"))
           )
      })

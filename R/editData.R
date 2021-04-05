@@ -137,7 +137,7 @@ server=function(input,output,session,length=length){
     })
 }
 
-if(viewer=="dialog") myviewer <- dialogViewer("editData", width = 1000, height = 800)
+if(viewer=="dialog") myviewer <- dialogViewer("editData", width = 1000, height = 1000)
 else if(viewer=="browser") myviewer <- browserViewer()
 else myviewer <- paneViewer()
 runGadget(ui, server, viewer = myviewer)
