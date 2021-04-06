@@ -99,6 +99,11 @@ editableDT=function(input,output,session,data,length=50){
      shortdata=reactive({
           input$Refresh
          data1<-data()
+
+         if(ncol(data1)==0){
+             result=NULL
+         } else{
+          RV$cols<-intersect(RV$cols,1:ncol(data1))
           result=as.data.frame(lapply(data1[RV$cols],makeShort,isolate(input$length)))
           rownames(result)=rownames(data1)
           if(identical(RV$cols,1:ncol(data1))&(max(sapply(data1,maxLength),na.rm=TRUE)<length)) {
@@ -106,6 +111,8 @@ editableDT=function(input,output,session,data,length=50){
           } else{
               RV$editable=FALSE
           }
+         }
+
           result
      })
 
