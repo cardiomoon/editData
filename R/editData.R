@@ -123,7 +123,7 @@ server=function(input,output,session){
 
         result=df()
 
-        stopApp(result)
+        stopApp(invisible(result))
     })
 
     observeEvent(input$cancel, {

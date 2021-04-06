@@ -543,9 +543,8 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
           } else {
               if(is.na(value)) value=""
               length1=nchar(data[[x]][row],keepNA=FALSE)
-              if(is.na(length1)){
-                  textInput3(ns(id),label,value=value,width=width)
-              } else if(length1<20){
+              width=max(length1*8,150)
+              if(length1<70){
                   textInput3(ns(id),label,value=value,width=width)
               } else{
                textAreaInput(ns(id),label,value=value,width="460px",rows=1+length1/60)
