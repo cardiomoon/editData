@@ -144,7 +144,8 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
                                            choiceNames=names(data()),
                                          choiceValues=1:no
                                  ),
-               actionButton(ns("selectAll"),"select all columns"),
+               actionButton(ns("selectAll"),"Select ALL columns",icon("ok",lib = "glyphicon")),
+               actionButton(ns("unselectAll"),"Unselect ALL columns",icon("remove",lib = "glyphicon")),
                numericInput(ns("length"),"Desired maximum length of cells",value=length),
                #p("caution : All change will be ignored !"),
                div(style = "display:inline-block;",
@@ -175,6 +176,10 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
      observeEvent(input$selectAll,{
          updateCheckboxGroupButtons(session,"checkgroup",selected=1:ncol(data()))
      })
+     observeEvent(input$unselectAll,{
+         updateCheckboxGroupButtons(session,"checkgroup",selected=NA)
+     })
+
 
      observeEvent(input$Refresh,{
          RV$cols<-as.integer(input$checkgroup)
