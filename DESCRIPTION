@@ -12,6 +12,7 @@ Imports:
     rio,
     magrittr,
     shinyWidgets,
+    lubridate,
     openxlsx
 Authors@R: person("Keon-Woong", "Moon", email = "cardiomoon@gmail.com",
                   role = c("aut", "cre"))

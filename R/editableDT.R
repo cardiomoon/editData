@@ -79,13 +79,14 @@ editableDTUI=function(id){
 #' @param data A reactive data object
 #' @param length numeric desired length of string
 #' @param cols numeric Initial columns to display
-#' @importFrom DT DTOutput renderDT dataTableProxy datatable replaceData
+#' @importFrom DT DTOutput renderDT dataTableProxy datatable replaceData coerceValue
 #' @importFrom openxlsx write.xlsx
 #' @importFrom shiny br span reactiveVal actionButton fluidRow icon modalButton modalDialog
 #' reactive removeModal renderUI showModal textAreaInput updateTextInput isolate conditionalPanel
 #' numericInput verbatimTextOutput showNotification
 #' @importFrom shinyWidgets dropdownButton tooltipOptions checkboxGroupButtons awesomeCheckbox
 #' updateCheckboxGroupButtons
+#' @importFrom lubridate as_datetime
 #' @export
 editableDT=function(input,output,session,data,length=50,cols=1:7){
 
@@ -376,22 +377,27 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
      observeEvent(input$update,{
           i= input$table_rows_selected[1]
           updateRowname=TRUE
-          if(length(grep("[^0-9]",rownames(finalDf())))==0) updateRowname=FALSE
-          if(input$rowname %in% rownames(finalDf())[-i]){
+          if(length(grep("[^0-9]",rownames(finalDf())))==0) {
+              updateRowname=FALSE
+          } else if(input$rowname %in% rownames(finalDf())[-i]){
               updateRowname=FALSE
               showNotification("Duplicated rownames is not allowed",duration=3,type="message")
           }
-          for(j in 1:ncol(df1())){
-
               newdf2 <- finalDf()
+              for(j in 1:ncol(newdf2)){
+                  if("POSIXct" %in% class(newdf2[i,j])){
+                      newdf2[i,j]<-lubridate::as_datetime(input[[paste0("colid",j)]])
+                  } else{
               newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
-
+                  }
+              }
               if(updateRowname) rownames(newdf2)[i]=input$rowname
               finalDf(newdf2)
               # result=as.data.frame(lapply(finalDf(),makeShort,length))
               # rownames(result)=rownames(finalDf())
               # newdf=result[RV$cols]
               # df1(newdf)
+
 
               newdf=df1()
               temp=as.data.frame(lapply(finalDf()[i,],makeShort,length))
@@ -400,7 +406,7 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
               df1(newdf)
               replaceData(proxy,df1(),resetPaging=FALSE)
 
-          }
+
           removeModal()
      })
 
@@ -409,8 +415,9 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
           # newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
           # finalDf(newdf2)
          updateRowname=TRUE
-         if(length(grep("[^0-9]",rownames(finalDf())))==0) updateRowname=FALSE
-         if(input$rowname %in% rownames(finalDf())[-i]){
+         if(length(grep("[^0-9]",rownames(finalDf())))==0) {
+             updateRowname=FALSE
+         } else if(input$rowname %in% rownames(finalDf())[-i]){
              updateRowname=FALSE
              showNotification("Duplicated rownames is not allowed",duration=3,type="message")
          }
@@ -421,8 +428,12 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
 
           newdf2 <- finalDf()
           for(j in 1:ncol(finalDf())){
+                  if("POSIXct" %in% class(newdf2[i,j])){
+                      newdf2[i,j]<-lubridate::as_datetime(input[[paste0("colid",j)]])
+                  } else{
+                      newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
+                  }
 
-               newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
           }
           if(updateRowname) rownames(newdf2)[i]=input$rowname
           finalDf(newdf2)
@@ -439,8 +450,9 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
      observeEvent(input$insertUp,{
           i= input$table_rows_selected
           updateRowname=TRUE
-          if(length(grep("[^0-9]",rownames(finalDf())))==0) updateRowname=FALSE
-          if(input$rowname %in% rownames(finalDf())[-i]){
+          if(length(grep("[^0-9]",rownames(finalDf())))==0) {
+              updateRowname=FALSE
+          } else if(input$rowname %in% rownames(finalDf())[-i]){
               updateRowname=FALSE
               showNotification("Duplicated rownames is not allowed",duration=3,type="message")
           }
@@ -448,7 +460,12 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
           newdf2<-rbind(newdf2[1:i,],newdf2[i:nrow(newdf2),])
 
           for(j in 1:ncol(finalDf())){
-               newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
+              if("POSIXct" %in% class(newdf2[i,j])){
+                  newdf2[i,j]<-lubridate::as_datetime(input[[paste0("colid",j)]])
+              } else{
+                  newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
+              }
+
           }
           if(updateRowname) rownames(newdf2)[i]=input$rowname
           finalDf(newdf2)
@@ -463,8 +480,9 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
      observeEvent(input$insertDown,{
          i= input$table_rows_selected
          updateRowname=TRUE
-         if(length(grep("[^0-9]",rownames(finalDf())))==0) updateRowname=FALSE
-         if(input$rowname %in% rownames(newdf2)[-i]){
+         if(length(grep("[^0-9]",rownames(finalDf())))==0) {
+             updateRowname=FALSE
+         } else if(input$rowname %in% rownames(finalDf())[-i]){
              updateRowname=FALSE
              showNotification("Duplicated rownames is not allowed",duration=3,type="message")
          }
@@ -473,7 +491,12 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
          newdf2<-rbind(newdf2[1:i,],newdf2[i:nrow(newdf2),])
          i=i+1
          for(j in 1:ncol(finalDf())){
-             newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
+             if("POSIXct" %in% class(newdf2[i,j])){
+                 newdf2[i,j]<-lubridate::as_datetime(input[[paste0("colid",j)]])
+             } else{
+                 newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
+             }
+
          }
          if(updateRowname) rownames(newdf2)[i]=input$rowname
          finalDf(newdf2)
