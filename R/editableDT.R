@@ -259,11 +259,29 @@ editableDT=function(input,output,session,data,length=50){
           v=info$value
 
           newdf <- df1()
-          newdf[i,j]<-DT::coerceValue(v, newdf[i, j])
+
+          if(j==0){
+              if(v %in% rownames(newdf)[-i]) {
+                  showNotification("Duplicated rownames is not allowed",duration=3,type="message")
+
+              } else{
+                  rownames(newdf)[i]=v
+              }
+          } else{
+             newdf[i,j]<-DT::coerceValue(v, newdf[i, j])
+          }
           df1(newdf)
           replaceData(proxy,df1(),resetPaging=FALSE)
           newdf2<-finalDf()
-          newdf2[i,j]<-DT::coerceValue(v, newdf2[i, j])
+          if(j==0){
+              if(v %in% rownames(newdf)[-i]){
+              } else{
+             rownames(newdf2)[i]=v
+              }
+          } else{
+             newdf2[i,j]<-DT::coerceValue(v, newdf2[i, j])
+
+          }
           finalDf(newdf2)
 
 
@@ -357,12 +375,19 @@ editableDT=function(input,output,session,data,length=50){
 
      observeEvent(input$update,{
           i= input$table_rows_selected[1]
+          updateRowname=TRUE
+          if(length(grep("[^0-9]",rownames(finalDf())))==0) updateRowname=FALSE
+          if(input$rowname %in% rownames(finalDf())[-i]){
+              updateRowname=FALSE
+              showNotification("Duplicated rownames is not allowed",duration=3,type="message")
+          }
           for(j in 1:ncol(df1())){
 
               newdf2 <- finalDf()
               newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
-              finalDf(newdf2)
 
+              if(updateRowname) rownames(newdf2)[i]=input$rowname
+              finalDf(newdf2)
               # result=as.data.frame(lapply(finalDf(),makeShort,length))
               # rownames(result)=rownames(finalDf())
               # newdf=result[RV$cols]
@@ -371,6 +396,7 @@ editableDT=function(input,output,session,data,length=50){
               newdf=df1()
               temp=as.data.frame(lapply(finalDf()[i,],makeShort,length))
               newdf[i,]=temp[RV$cols]
+              if(updateRowname) rownames(newdf)[i]=input$rowname
               df1(newdf)
               replaceData(proxy,df1(),resetPaging=FALSE)
 
@@ -382,6 +408,12 @@ editableDT=function(input,output,session,data,length=50){
           # newdf2 <- finalDf()
           # newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
           # finalDf(newdf2)
+         updateRowname=TRUE
+         if(length(grep("[^0-9]",rownames(finalDf())))==0) updateRowname=FALSE
+         if(input$rowname %in% rownames(finalDf())[-i]){
+             updateRowname=FALSE
+             showNotification("Duplicated rownames is not allowed",duration=3,type="message")
+         }
 
           newdf2=finalDf()
           newdf2<-rbind(newdf2,newdf2[nrow(newdf2),])
@@ -390,14 +422,15 @@ editableDT=function(input,output,session,data,length=50){
           newdf2 <- finalDf()
           for(j in 1:ncol(finalDf())){
 
-
                newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
           }
+          if(updateRowname) rownames(newdf2)[i]=input$rowname
           finalDf(newdf2)
 
           result=as.data.frame(lapply(finalDf(),makeShort,length))
           rownames(result)=rownames(finalDf())
           newdf=result[RV$cols]
+          if(updateRowname) rownames(newdf)[i]=input$rowname
           df1(newdf)
           replaceData(proxy,df1(),resetPaging=FALSE)
           removeModal()
@@ -405,32 +438,49 @@ editableDT=function(input,output,session,data,length=50){
 
      observeEvent(input$insertUp,{
           i= input$table_rows_selected
+          updateRowname=TRUE
+          if(length(grep("[^0-9]",rownames(finalDf())))==0) updateRowname=FALSE
+          if(input$rowname %in% rownames(finalDf())[-i]){
+              updateRowname=FALSE
+              showNotification("Duplicated rownames is not allowed",duration=3,type="message")
+          }
           newdf2=finalDf()
           newdf2<-rbind(newdf2[1:i,],newdf2[i:nrow(newdf2),])
 
           for(j in 1:ncol(finalDf())){
                newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
           }
+          if(updateRowname) rownames(newdf2)[i]=input$rowname
           finalDf(newdf2)
           result=as.data.frame(lapply(finalDf(),makeShort,length))
           rownames(result)=rownames(finalDf())
           newdf=result[RV$cols]
+          if(updateRowname) rownames(newdf)[i]=input$rowname
           df1(newdf)
           replaceData(proxy,df1(),resetPaging=FALSE)
           removeModal()
      })
      observeEvent(input$insertDown,{
          i= input$table_rows_selected
+         updateRowname=TRUE
+         if(length(grep("[^0-9]",rownames(finalDf())))==0) updateRowname=FALSE
+         if(input$rowname %in% rownames(newdf2)[-i]){
+             updateRowname=FALSE
+             showNotification("Duplicated rownames is not allowed",duration=3,type="message")
+         }
+
          newdf2=finalDf()
          newdf2<-rbind(newdf2[1:i,],newdf2[i:nrow(newdf2),])
          i=i+1
          for(j in 1:ncol(finalDf())){
              newdf2[i,j]<-DT::coerceValue(input[[paste0("colid",j)]], newdf2[i, j])
          }
+         if(updateRowname) rownames(newdf2)[i]=input$rowname
          finalDf(newdf2)
          result=as.data.frame(lapply(finalDf(),makeShort,length))
          rownames(result)=rownames(finalDf())
          newdf=result[RV$cols]
+         if(updateRowname) rownames(newdf)[i]=input$rowname
          df1(newdf)
          replaceData(proxy,df1(),resetPaging=FALSE)
          removeModal()
@@ -439,13 +489,32 @@ editableDT=function(input,output,session,data,length=50){
 
      data2input=function(data,row){
 
-          lapply(1:ncol(data),vector2input,data,row)
+          lapply(0:ncol(data),vector2input,data,row)
 
      }
 
 
      vector2input=function(x,data,row){
-          kind=class(data[[x]])
+         if(x==0) {
+             if(length(grep("[^0-9]",rownames(data)))==0){
+                 return(NULL)
+             } else{
+                 value=rownames(data)[row]
+                 length1=nchar(value,keepNA=FALSE)
+                 label="rowname"
+                 id="rowname"
+                 width=max(nchar(rownames(data)[x]),nchar(label),150)
+                 if(is.na(length1)){
+                     textInput3(ns(id),label,value=value,width=width)
+                 } else if(length1<20){
+                     textInput3(ns(id),label,value=value,width=width)
+                 } else{
+                     textAreaInput(ns(id),label,value=value,width="460px",rows=1+length1/60)
+                 }
+             }
+         } else{
+
+         kind=class(data[[x]])
           id=paste0("colid",x)
           label=names(data)[x]
           if(row>nrow(data)){
@@ -482,6 +551,7 @@ editableDT=function(input,output,session,data,length=50){
                textAreaInput(ns(id),label,value=value,width="460px",rows=1+length1/60)
                }
           }
+       }
 
 
      }
