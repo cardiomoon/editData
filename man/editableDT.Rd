@@ -4,7 +4,16 @@
 \alias{editableDT}
 \title{Server function of editableDT Shiny module}
 \usage{
-editableDT(input, output, session, data, length = 50, cols = 1:7)
+editableDT(
+  input,
+  output,
+  session,
+  data,
+  length = 50,
+  cols = 1:7,
+  showButtons = TRUE,
+  enableSave = TRUE
+)
 }
 \arguments{
 \item{input}{input}
@@ -18,6 +27,10 @@ editableDT(input, output, session, data, length = 50, cols = 1:7)
 \item{length}{numeric desired length of string}
 
 \item{cols}{numeric Initial columns to display}
+
+\item{showButtons}{logical}
+
+\item{enableSave}{logical}
 }
 \description{
 Server function of editableDT Shiny module

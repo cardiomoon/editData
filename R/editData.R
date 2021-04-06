@@ -3,6 +3,8 @@
 #' @param viewer Specify where the gadget should be displayed. Possible choices are c("dialog","browser","pane")
 #' @param length Numeric desired maximum length of string
 #' @param cols numeric
+#' @param showButtons logical
+#' @param enableSave logical
 #' @importFrom rstudioapi getActiveDocumentContext
 #' @importFrom miniUI miniPage gadgetTitleBar miniContentPanel
 #' @importFrom utils read.csv str write.csv
@@ -19,7 +21,7 @@
 #'     result<-editData(mtcars)
 #'     result
 #' }
-editData=function(data=NULL,viewer="dialog",length=50,cols=1:7){
+editData=function(data=NULL,viewer="dialog",length=50,cols=1:7,showButtons=TRUE,enableSave=TRUE){
 
     # data("sampleData",package="editData",envir=environment())
     data("sampleData",package="editData",envir=environment())
@@ -88,7 +90,8 @@ server=function(input,output,session){
 
 
 
-    df=callModule(editableDT,"table1",data=reactive(RV$df),length=length,cols=cols)
+    df=callModule(editableDT,"table1",data=reactive(RV$df),
+                  length=length,cols=cols,showButtons=showButtons,enableSave=enableSave)
 
 
     observeEvent(input$file1,{

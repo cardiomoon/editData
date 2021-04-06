@@ -79,6 +79,8 @@ editableDTUI=function(id){
 #' @param data A reactive data object
 #' @param length numeric desired length of string
 #' @param cols numeric Initial columns to display
+#' @param showButtons logical
+#' @param enableSave logical
 #' @importFrom DT DTOutput renderDT dataTableProxy datatable replaceData coerceValue
 #' @importFrom openxlsx write.xlsx
 #' @importFrom shiny br span reactiveVal actionButton fluidRow icon modalButton modalDialog
@@ -88,7 +90,7 @@ editableDTUI=function(id){
 #' updateCheckboxGroupButtons
 #' @importFrom lubridate as_datetime
 #' @export
-editableDT=function(input,output,session,data,length=50,cols=1:7){
+editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRUE,enableSave=TRUE){
 
      ns <- session$ns
 
@@ -99,16 +101,16 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
      RV=reactiveValues(cols=cols,editable=FALSE)
 
      observeEvent(data(),{
-         RV$cols=intersect(cols,1:ncol(data()))
-
-         df1(shortdata())
          finalDf(data())
+         RV$cols=intersect(cols,1:ncol(finalDf()))
+         df1(shortdata())
+
      })
 
 
      shortdata=reactive({
           input$Refresh
-         data1<-data()
+         data1<-finalDf()
 
          if(ncol(data1)==0){
              result=NULL
@@ -126,35 +128,46 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
           result
      })
 
+     output$dropUI=renderUI({
+         no=ncol(data())
+         selected=intersect(1:no,RV$cols)
+
+         dropdownButton(
+
+             checkboxGroupButtons(ns("checkgroup"),"Select Columns to be displayed",
+                                  #status = "primary",
+                                  selected=selected,
+                                  checkIcon = list(
+                                      yes = icon("ok",
+                                                 lib = "glyphicon"),
+                                      no = icon("remove",
+                                                lib = "glyphicon")),
+                                  choiceNames=names(data()),
+                                  choiceValues=1:no
+             ),
+             actionButton(ns("selectAll"),"Select ALL columns",icon("ok",lib = "glyphicon")),
+             actionButton(ns("unselectAll"),"Unselect ALL columns",icon("remove",lib = "glyphicon")),
+             numericInput(ns("length"),"Desired maximum length of cells",value=length),
+             actionButton(ns("Refresh"),"Apply Selected Columns and Length",class = "btn-info"),
+
+             circle=TRUE,status="info",icon = icon("gear"),width="600px",
+             tooltip=tooltipOptions(title="Customize Table")
+         )
+     })
+
 
      output$editableDTModule=renderUI({
-          no=ncol(data())
-          selected=intersect(1:no,RV$cols)
 
           tagList(
-               dropdownButton(
-               checkboxGroupButtons(ns("checkgroup"),"Select Columns to be displayed",
-                                    #status = "primary",
-                                    selected=selected,
-                                    checkIcon = list(
-                                        yes = icon("ok",
-                                                   lib = "glyphicon"),
-                                        no = icon("remove",
-                                                  lib = "glyphicon")),
-                                           choiceNames=names(data()),
-                                         choiceValues=1:no
-                                 ),
-               actionButton(ns("selectAll"),"Select ALL columns",icon("ok",lib = "glyphicon")),
-               actionButton(ns("unselectAll"),"Unselect ALL columns",icon("remove",lib = "glyphicon")),
-               numericInput(ns("length"),"Desired maximum length of cells",value=length),
-               #p("caution : All change will be ignored !"),
-               div(style = "display:inline-block;",
-                   actionButton(ns("Refresh"),"Apply Selected Columns and Length",class = "btn-info"),
-                   span(style="color:red", "Caution : All changes will be ignored !")),
-               circle=TRUE,status="info",icon = icon("gear"),width="600px",
-               tooltip=tooltipOptions(title="Customize Table")
-               ),
+               uiOutput(ns("dropUI")),
                br(),
+
+               conditionalPanel("true==false",
+                                checkboxInput(ns("showButtons"),"showButtons",value=showButtons),
+                                checkboxInput(ns("enableSave"),"enableSave",value=enableSave)
+                                ),
+               div(style="display:inline-block;",
+               conditionalPanel(sprintf("input[['%s']]==true",ns("showButtons")),
                actionButton(ns("delete"),"Delete",icon=icon("trash-alt")),
                actionButton(ns("reset"),"Restore",icon=icon("trash-restore")),
                actionButton(ns("edit"),"Edit",icon=icon("pen-fancy")),
@@ -163,11 +176,13 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
                actionButton(ns("deleteAll"),"Delete All",icon=icon("minus-square")),
                br(),
                br(),
-               awesomeCheckbox(ns("confirm"),"Confirm delete or restore",value=TRUE),
+               awesomeCheckbox(ns("confirm"),"Confirm delete or restore",value=TRUE))),
+               awesomeCheckbox(ns("simpleColNames"),"Use simple column names",value=FALSE),
                DTOutput(ns("table")),
+               conditionalPanel(sprintf("input[['%s']]==true",ns("enableSave")),
                downloadButton(ns("downloadData"), "download as CSV",icon=icon("file-csv")),
                downloadButton(ns("downloadExcel"), "download as Excel",icon=icon("file-excel")),
-               downloadButton(ns("downloadRDS"), "download as RDS"),
+               downloadButton(ns("downloadRDS"), "download as RDS")),
                hr()
                # ,verbatimTextOutput(ns("test1"))
           )
@@ -184,7 +199,6 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
      observeEvent(input$Refresh,{
          RV$cols<-as.integer(input$checkgroup)
          df1(shortdata())
-         finalDf(data())
      })
 
      # output$test1=renderPrint({
@@ -204,11 +218,17 @@ editableDT=function(input,output,session,data,length=50,cols=1:7){
 
 
      output$table <- renderDT({
-          datatable(shortdata(),
+
+          if(input$simpleColNames){
+              datatable(shortdata(),
+                        editable=RV$editable,
+                        colnames=paste0("col",1:ncol(shortdata())),
+                        options=list(pageLength=10))
+          } else{
+              datatable(shortdata(),
                     editable=RV$editable,
-                    options=list(
-                         pageLength=10
-                    ))
+                    options=list(pageLength=10))
+          }
      })
 
      proxy = dataTableProxy('table')
