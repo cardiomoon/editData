@@ -2,6 +2,7 @@
 #' @param data A tibble or a tbl_df or a data.frame to manipulate
 #' @param viewer Specify where the gadget should be displayed. Possible choices are c("dialog","browser","pane")
 #' @param length Numeric desired maximum length of string
+#' @param cols numeric
 #' @importFrom rstudioapi getActiveDocumentContext
 #' @importFrom miniUI miniPage gadgetTitleBar miniContentPanel
 #' @importFrom utils read.csv str write.csv
@@ -18,7 +19,7 @@
 #'     result<-editData(mtcars)
 #'     result
 #' }
-editData=function(data=NULL,viewer="dialog",length=50){
+editData=function(data=NULL,viewer="dialog",length=50,cols=1:7){
 
     # data("sampleData",package="editData",envir=environment())
     data("sampleData",package="editData",envir=environment())
@@ -59,7 +60,7 @@ ui<-miniPage(
 
 ))
 
-server=function(input,output,session,length=length){
+server=function(input,output,session){
 
      # if(!isNamespaceLoaded("tidyverse")){
      #      attachNamespace("tidyverse")
@@ -81,8 +82,13 @@ server=function(input,output,session,length=length){
 
      })
 
+    # cat("in server\n")
+    # cat("length=",length,"\n")
+    # cat("cols=",cols,"\n")
 
-    df=callModule(editableDT,"table1",data=reactive(RV$df))
+
+
+    df=callModule(editableDT,"table1",data=reactive(RV$df),length=length,cols=cols)
 
 
     observeEvent(input$file1,{

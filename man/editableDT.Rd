@@ -4,7 +4,7 @@
 \alias{editableDT}
 \title{Server function of editableDT Shiny module}
 \usage{
-editableDT(input, output, session, data, length = 50)
+editableDT(input, output, session, data, length = 50, cols = 1:7)
 }
 \arguments{
 \item{input}{input}
@@ -15,7 +15,9 @@ editableDT(input, output, session, data, length = 50)
 
 \item{data}{A reactive data object}
 
-\item{length}{numeric desired length}
+\item{length}{numeric desired length of string}
+
+\item{cols}{numeric Initial columns to display}
 }
 \description{
 Server function of editableDT Shiny module

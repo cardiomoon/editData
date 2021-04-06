@@ -77,16 +77,17 @@ editableDTUI=function(id){
 #' @param output output
 #' @param session session
 #' @param data A reactive data object
-#' @param length numeric desired length
+#' @param length numeric desired length of string
+#' @param cols numeric Initial columns to display
 #' @importFrom DT DTOutput renderDT dataTableProxy datatable replaceData
 #' @importFrom openxlsx write.xlsx
 #' @importFrom shiny br span reactiveVal actionButton fluidRow icon modalButton modalDialog
 #' reactive removeModal renderUI showModal textAreaInput updateTextInput isolate conditionalPanel
-#' numericInput verbatimTextOutput
+#' numericInput verbatimTextOutput showNotification
 #' @importFrom shinyWidgets dropdownButton tooltipOptions checkboxGroupButtons awesomeCheckbox
 #' updateCheckboxGroupButtons
 #' @export
-editableDT=function(input,output,session,data,length=50){
+editableDT=function(input,output,session,data,length=50,cols=1:7){
 
      ns <- session$ns
 
@@ -94,7 +95,15 @@ editableDT=function(input,output,session,data,length=50){
 
      finalDf<-reactiveVal()
 
-     RV=reactiveValues(cols=1:7,editable=FALSE)
+     RV=reactiveValues(cols=cols,editable=FALSE)
+
+     observeEvent(data(),{
+         RV$cols=intersect(cols,1:ncol(data()))
+
+         df1(shortdata())
+         finalDf(data())
+     })
+
 
      shortdata=reactive({
           input$Refresh
@@ -116,15 +125,6 @@ editableDT=function(input,output,session,data,length=50){
           result
      })
 
-     observeEvent(data(),{
-         if(ncol(data())<7) {
-             RV$cols=1:ncol(data())
-         } else{
-             RV$cols=1:7
-         }
-         df1(shortdata())
-         finalDf(data())
-     })
 
      output$editableDTModule=renderUI({
           no=ncol(data())
