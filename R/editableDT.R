@@ -131,6 +131,7 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
      output$dropUI=renderUI({
          no=ncol(data())
          selected=intersect(1:no,RV$cols)
+         temp=makeShort(names(data()),length=length)
 
          dropdownButton(
 
@@ -142,7 +143,7 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
                                                  lib = "glyphicon"),
                                       no = icon("remove",
                                                 lib = "glyphicon")),
-                                  choiceNames=names(data()),
+                                  choiceNames=temp,
                                   choiceValues=1:no
              ),
              actionButton(ns("selectAll"),"Select ALL columns",icon("ok",lib = "glyphicon")),
