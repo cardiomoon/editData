@@ -101,6 +101,13 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
 
      RV=reactiveValues(cols=cols,editable=FALSE)
 
+     if(!is.null(editable)){
+         if(editable==FALSE){
+             showButtons=FALSE
+             enableSave=FALSE
+         }
+     }
+
      observeEvent(data(),{
          finalDf(data())
          RV$cols=intersect(cols,1:ncol(finalDf()))
@@ -121,13 +128,17 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
           result=as.data.frame(lapply(data1[RV$cols],makeShort,isolate(input$length)))
           rownames(result)=rownames(data1)
           if(is.null(editable)){
+
                 if(identical(RV$cols,1:ncol(data1))&(max(sapply(data1,maxLength),na.rm=TRUE)<length)) {
                       RV$editable=TRUE
                 } else{
                     RV$editable=FALSE
                 }
+
           } else{
+
               RV$editable=editable
+
           }
          }
 

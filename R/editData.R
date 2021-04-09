@@ -89,13 +89,6 @@ server=function(input,output,session){
     # cat("length=",length,"\n")
     # cat("cols=",cols,"\n")
 
-    if(!is.null(editable)){
-        if(editable==FALSE){
-           showButtons=FALSE
-           enableSave=FALSE
-        }
-    }
-
     df=callModule(editableDT,"table1",data=reactive(RV$df),
                   length=length,cols=cols,showButtons=showButtons,enableSave=enableSave,editable=editable)
 
