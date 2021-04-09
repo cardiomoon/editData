@@ -86,7 +86,7 @@ editableDTUI=function(id){
 #' @importFrom openxlsx write.xlsx
 #' @importFrom shiny br span reactiveVal actionButton fluidRow icon modalButton modalDialog
 #' reactive removeModal renderUI showModal textAreaInput updateTextInput isolate conditionalPanel
-#' numericInput verbatimTextOutput showNotification
+#' numericInput verbatimTextOutput showNotification textOutput renderText
 #' @importFrom shinyWidgets dropdownButton tooltipOptions checkboxGroupButtons awesomeCheckbox
 #' updateCheckboxGroupButtons
 #' @importFrom lubridate as_datetime
@@ -121,7 +121,9 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
          # data1<-finalDf()
          data1<-data()
 
-         if(ncol(data1)==0){
+         if(is.null(data1)){
+             result=NULL
+         } else if(ncol(data1)==0){
              result=NULL
          } else{
           RV$cols<-intersect(RV$cols,1:ncol(data1))
@@ -146,6 +148,7 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
      })
 
      output$dropUI=renderUI({
+         if(!is.null(data())){
          no=ncol(data())
          selected=intersect(1:no,RV$cols)
          temp=makeShort(names(data()),length=length)
@@ -171,12 +174,15 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
              circle=TRUE,status="info",icon = icon("gear"),width="600px",
              tooltip=tooltipOptions(title="Customize Table")
          )
+         }
      })
 
 
      output$editableDTModule=renderUI({
 
           tagList(
+              tags$style(type='text/css', sprintf('#%s {color: green;}',ns("dataCheck"))),
+               textOutput(ns("dataCheck")),
                uiOutput(ns("dropUI")),
 
 
@@ -206,6 +212,12 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
                hr()
                 #,verbatimTextOutput(ns("test1"))
           )
+     })
+
+     output$dataCheck=renderText({
+          if(is.null(data())) {
+              "Please enter valid data name !"
+          }
      })
 
      observeEvent(input$selectAll,{
@@ -238,6 +250,7 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
 
 
      output$table <- renderDT({
+          if(!is.null(shortdata())){
 
           if(input$simpleColNames){
               datatable(shortdata(),
@@ -248,6 +261,7 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
               datatable(shortdata(),
                     editable=RV$editable,
                     options=list(pageLength=10))
+          }
           }
      })
 

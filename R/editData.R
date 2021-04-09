@@ -58,8 +58,7 @@ ui<-miniPage(
     column(6,
     textInput3("mydata","Or Enter data name",value=mydata,width=150,bg="lightcyan"))),
     editableDTUI("table1")
-
-    #,verbatimTextOutput("text1")
+    # ,verbatimTextOutput("text1")
 
 ))
 
@@ -85,9 +84,6 @@ server=function(input,output,session){
 
      })
 
-    # cat("in server\n")
-    # cat("length=",length,"\n")
-    # cat("cols=",cols,"\n")
 
     df=callModule(editableDT,"table1",data=reactive(RV$df),
                   length=length,cols=cols,showButtons=showButtons,enableSave=enableSave,editable=editable)
@@ -95,11 +91,6 @@ server=function(input,output,session){
 
     observeEvent(input$file1,{
         if(!is.null(input$file1)) {
-             # data1=myimport(input$file1$datapath)
-             # dataname=ifelse(input$mydata=="uploaded","uploaded1","uploaded")
-             # assign(dataname,data1,envir=environment())
-             # updateTextInput(session,"mydata",value=dataname)
-             # RV$df<-data1
 
             if(input$mydata!="uploaded"){
                 uploaded<<-myimport(input$file1$datapath)
@@ -116,6 +107,7 @@ server=function(input,output,session){
 
     # output$text1=renderPrint({
     #     str(RV$df)
+    #     str(df())
     #
     # })
 
