@@ -12,7 +12,8 @@ editableDT(
   length = 50,
   cols = 1:7,
   showButtons = TRUE,
-  enableSave = TRUE
+  enableSave = TRUE,
+  editable = NULL
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ editableDT(
 \item{showButtons}{logical}
 
 \item{enableSave}{logical}
+
+\item{editable}{logical}
 }
 \description{
 Server function of editableDT Shiny module

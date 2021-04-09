@@ -10,7 +10,8 @@ editData(
   length = 50,
   cols = 1:7,
   showButtons = TRUE,
-  enableSave = TRUE
+  enableSave = TRUE,
+  editable = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ editData(
 \item{showButtons}{logical}
 
 \item{enableSave}{logical}
+
+\item{editable}{logical}
 }
 \value{
 A manipulated 'data.frame' or NULL

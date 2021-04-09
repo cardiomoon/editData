@@ -81,6 +81,7 @@ editableDTUI=function(id){
 #' @param cols numeric Initial columns to display
 #' @param showButtons logical
 #' @param enableSave logical
+#' @param editable logical
 #' @importFrom DT DTOutput renderDT dataTableProxy datatable replaceData coerceValue
 #' @importFrom openxlsx write.xlsx
 #' @importFrom shiny br span reactiveVal actionButton fluidRow icon modalButton modalDialog
@@ -90,7 +91,7 @@ editableDTUI=function(id){
 #' updateCheckboxGroupButtons
 #' @importFrom lubridate as_datetime
 #' @export
-editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRUE,enableSave=TRUE){
+editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRUE,enableSave=TRUE, editable=NULL){
 
      ns <- session$ns
 
@@ -110,7 +111,8 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
 
      shortdata=reactive({
           input$Refresh
-         data1<-finalDf()
+         # data1<-finalDf()
+         data1<-data()
 
          if(ncol(data1)==0){
              result=NULL
@@ -118,10 +120,14 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
           RV$cols<-intersect(RV$cols,1:ncol(data1))
           result=as.data.frame(lapply(data1[RV$cols],makeShort,isolate(input$length)))
           rownames(result)=rownames(data1)
-          if(identical(RV$cols,1:ncol(data1))&(max(sapply(data1,maxLength),na.rm=TRUE)<length)) {
-              RV$editable=TRUE
+          if(is.null(editable)){
+                if(identical(RV$cols,1:ncol(data1))&(max(sapply(data1,maxLength),na.rm=TRUE)<length)) {
+                      RV$editable=TRUE
+                } else{
+                    RV$editable=FALSE
+                }
           } else{
-              RV$editable=FALSE
+              RV$editable=editable
           }
          }
 
@@ -161,7 +167,7 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
 
           tagList(
                uiOutput(ns("dropUI")),
-               br(),
+
 
                conditionalPanel("true==false",
                                 checkboxInput(ns("showButtons"),"showButtons",value=showButtons),
@@ -169,12 +175,14 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
                                 ),
                div(style="display:inline-block;",
                conditionalPanel(sprintf("input[['%s']]==true",ns("showButtons")),
-               actionButton(ns("delete"),"Delete",icon=icon("trash-alt")),
-               actionButton(ns("reset"),"Restore",icon=icon("trash-restore")),
-               actionButton(ns("edit"),"Edit",icon=icon("pen-fancy")),
-               actionButton(ns("add"),"Add",icon=icon("plus-square")),
-               actionButton(ns("insert"),"Insert",icon=icon("search-plus")),
-               actionButton(ns("deleteAll"),"Delete All",icon=icon("minus-square")),
+                    br(),
+                    actionButton(ns("delete"),"Delete",icon=icon("trash-alt")),
+                    actionButton(ns("reset"),"Restore",icon=icon("trash-restore")),
+                    actionButton(ns("edit"),"Edit",icon=icon("pen-fancy")),
+                    actionButton(ns("add"),"Add",icon=icon("plus-square")),
+                    actionButton(ns("insert"),"Insert",icon=icon("search-plus")),
+                    actionButton(ns("deleteAll"),"Delete All",icon=icon("minus-square")
+               ),
                br(),
                br(),
                awesomeCheckbox(ns("confirm"),"Confirm delete or restore",value=TRUE))),
@@ -185,7 +193,7 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
                downloadButton(ns("downloadExcel"), "download as Excel",icon=icon("file-excel")),
                downloadButton(ns("downloadRDS"), "download as RDS")),
                hr()
-               # ,verbatimTextOutput(ns("test1"))
+                #,verbatimTextOutput(ns("test1"))
           )
      })
 
@@ -609,7 +617,9 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
                "mydata.csv"
           },
           content = function(file) {
-               write.csv(finalDf(), file, row.names = FALSE)
+               updateRowname=TRUE
+               if(length(grep("[^0-9]",rownames(finalDf())))==0) updateRowname=FALSE
+               write.csv(finalDf(), file, row.names = updateRowname)
           }
      )
 
@@ -618,7 +628,9 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
                "mydata.xlsx"
           },
           content = function(file) {
-               write.xlsx(finalDf(), file,asTable=TRUE)
+              updateRowname=TRUE
+              if(length(grep("[^0-9]",rownames(finalDf())))==0) updateRowname=FALSE
+               write.xlsx(finalDf(), file,asTable=TRUE,row.names=updateRowname)
           }
      )
      output$downloadRDS <- downloadHandler(
