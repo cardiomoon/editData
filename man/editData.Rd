@@ -9,6 +9,7 @@ editData(
   viewer = "dialog",
   length = 50,
   cols = 1:7,
+  status = "default",
   showButtons = TRUE,
   enableSave = TRUE,
   editable = NULL
@@ -22,6 +23,8 @@ editData(
 \item{length}{Numeric desired maximum length of string}
 
 \item{cols}{numeric}
+
+\item{status}{character. dropdownButton status. One of c("default","info","primary","danger","warning","success")}
 
 \item{showButtons}{logical}
 

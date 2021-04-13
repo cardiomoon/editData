@@ -79,6 +79,7 @@ editableDTUI=function(id){
 #' @param data A reactive data object
 #' @param length numeric desired length of string
 #' @param cols numeric Initial columns to display
+#' @param status character. dropdownButton status. One of c("default","info","primary","danger","warning","success")
 #' @param showButtons logical
 #' @param enableSave logical
 #' @param editable logical
@@ -91,7 +92,7 @@ editableDTUI=function(id){
 #' updateCheckboxGroupButtons
 #' @importFrom lubridate as_datetime
 #' @export
-editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRUE,enableSave=TRUE, editable=NULL){
+editableDT=function(input,output,session,data,length=50,cols=1:7,status="default",showButtons=TRUE,enableSave=TRUE, editable=NULL){
 
      ns <- session$ns
 
@@ -171,7 +172,7 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,showButtons=TRU
              numericInput(ns("length"),"Desired maximum length of cells",value=length),
              actionButton(ns("Refresh"),"Apply Selected Columns and Length",class = "btn-info"),
 
-             circle=TRUE,status="info",icon = icon("gear"),width="600px",
+             circle=TRUE,status=status,icon = icon("gear"),width="600px",
              tooltip=tooltipOptions(title="Customize Table")
          )
          }

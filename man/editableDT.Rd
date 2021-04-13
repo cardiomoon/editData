@@ -11,6 +11,7 @@ editableDT(
   data,
   length = 50,
   cols = 1:7,
+  status = "default",
   showButtons = TRUE,
   enableSave = TRUE,
   editable = NULL
@@ -28,6 +29,8 @@ editableDT(
 \item{length}{numeric desired length of string}
 
 \item{cols}{numeric Initial columns to display}
+
+\item{status}{character. dropdownButton status. One of c("default","info","primary","danger","warning","success")}
 
 \item{showButtons}{logical}
 

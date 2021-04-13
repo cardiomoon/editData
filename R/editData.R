@@ -3,6 +3,7 @@
 #' @param viewer Specify where the gadget should be displayed. Possible choices are c("dialog","browser","pane")
 #' @param length Numeric desired maximum length of string
 #' @param cols numeric
+#' @param status character. dropdownButton status. One of c("default","info","primary","danger","warning","success")
 #' @param showButtons logical
 #' @param enableSave logical
 #' @param editable logical
@@ -22,7 +23,7 @@
 #'     result<-editData(mtcars)
 #'     result
 #' }
-editData=function(data=NULL,viewer="dialog",length=50,cols=1:7,showButtons=TRUE,enableSave=TRUE,editable=NULL){
+editData=function(data=NULL,viewer="dialog",length=50,cols=1:7,status="default",showButtons=TRUE,enableSave=TRUE,editable=NULL){
 
     # data("sampleData",package="editData",envir=environment())
     data("sampleData",package="editData",envir=environment())
@@ -86,7 +87,7 @@ server=function(input,output,session){
 
 
     df=callModule(editableDT,"table1",data=reactive(RV$df),
-                  length=length,cols=cols,showButtons=showButtons,enableSave=enableSave,editable=editable)
+                  length=length,cols=cols,status=status,showButtons=showButtons,enableSave=enableSave,editable=editable)
 
 
     observeEvent(input$file1,{
