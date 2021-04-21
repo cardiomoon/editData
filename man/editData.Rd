@@ -12,7 +12,8 @@ editData(
   status = "default",
   showButtons = TRUE,
   enableSave = TRUE,
-  editable = NULL
+  editable = NULL,
+  ...
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ editData(
 \item{enableSave}{logical}
 
 \item{editable}{logical}
+
+\item{...}{Further arguments to be passed to datatable()}
 }
 \value{
 A manipulated 'data.frame' or NULL

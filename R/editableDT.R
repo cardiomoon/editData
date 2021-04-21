@@ -27,9 +27,11 @@ maxLength=function(x){
 #' @export
 makeShort=function(x,length=50){
     if(is.character(x)){
+        if(length(grep("<a href",x))==0){
         select<-nchar(x,keepNA=FALSE)>length
         select
         x[select]<-paste0(substr(x[select],1,length),"...")
+        }
     }
     x
 }
@@ -83,6 +85,7 @@ editableDTUI=function(id){
 #' @param showButtons logical
 #' @param enableSave logical
 #' @param editable logical
+#' @param ... Further arguments to be passed to datatable()
 #' @importFrom DT DTOutput renderDT dataTableProxy datatable replaceData coerceValue
 #' @importFrom openxlsx write.xlsx
 #' @importFrom shiny br span reactiveVal actionButton fluidRow icon modalButton modalDialog
@@ -92,7 +95,7 @@ editableDTUI=function(id){
 #' updateCheckboxGroupButtons
 #' @importFrom lubridate as_datetime
 #' @export
-editableDT=function(input,output,session,data,length=50,cols=1:7,status="default",showButtons=TRUE,enableSave=TRUE, editable=NULL){
+editableDT=function(input,output,session,data,length=50,cols=1:7,status="default",showButtons=TRUE,enableSave=TRUE, editable=NULL,...){
 
      ns <- session$ns
 
@@ -257,11 +260,11 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,status="default
               datatable(shortdata(),
                         editable=RV$editable,
                         colnames=paste0("col",1:ncol(shortdata())),
-                        options=list(pageLength=10))
+                        options=list(pageLength=10),...)
           } else{
               datatable(shortdata(),
                     editable=RV$editable,
-                    options=list(pageLength=10))
+                    options=list(pageLength=10),...)
           }
           }
      })

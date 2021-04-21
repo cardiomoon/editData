@@ -14,7 +14,8 @@ editableDT(
   status = "default",
   showButtons = TRUE,
   enableSave = TRUE,
-  editable = NULL
+  editable = NULL,
+  ...
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ editableDT(
 \item{enableSave}{logical}
 
 \item{editable}{logical}
+
+\item{...}{Further arguments to be passed to datatable()}
 }
 \description{
 Server function of editableDT Shiny module
