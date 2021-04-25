@@ -7,6 +7,7 @@
 #' @param showButtons logical
 #' @param enableSave logical
 #' @param editable logical
+#' @param formatList Null or list. Format list to be passed to formatStyle
 #' @param ... Further arguments to be passed to datatable()
 #' @importFrom rstudioapi getActiveDocumentContext
 #' @importFrom miniUI miniPage gadgetTitleBar miniContentPanel
@@ -24,7 +25,7 @@
 #'     result<-editData(mtcars)
 #'     result
 #' }
-editData=function(data=NULL,viewer="dialog",length=50,cols=1:7,status="default",showButtons=TRUE,enableSave=TRUE,editable=NULL,...){
+editData=function(data=NULL,viewer="dialog",length=50,cols=1:7,status="default",showButtons=TRUE,enableSave=TRUE,editable=NULL,formatList=NULL,...){
 
     # data("sampleData",package="editData",envir=environment())
     data("sampleData",package="editData",envir=environment())
@@ -88,7 +89,8 @@ server=function(input,output,session){
 
 
     df=callModule(editableDT,"table1",data=reactive(RV$df),
-                  length=length,cols=cols,status=status,showButtons=showButtons,enableSave=enableSave,editable=editable,...)
+                  length=length,cols=cols,status=status,showButtons=showButtons,
+                  enableSave=enableSave,editable=editable,formatList=formatList,...)
 
 
     observeEvent(input$file1,{

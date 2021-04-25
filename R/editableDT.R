@@ -85,8 +85,9 @@ editableDTUI=function(id){
 #' @param showButtons logical
 #' @param enableSave logical
 #' @param editable logical
+#' @param formatList Null or list. Format list to be passed to formatStyle
 #' @param ... Further arguments to be passed to datatable()
-#' @importFrom DT DTOutput renderDT dataTableProxy datatable replaceData coerceValue
+#' @importFrom DT DTOutput renderDT dataTableProxy datatable replaceData coerceValue formatStyle
 #' @importFrom openxlsx write.xlsx
 #' @importFrom shiny br span reactiveVal actionButton fluidRow icon modalButton modalDialog
 #' reactive removeModal renderUI showModal textAreaInput updateTextInput isolate conditionalPanel
@@ -95,7 +96,7 @@ editableDTUI=function(id){
 #' updateCheckboxGroupButtons
 #' @importFrom lubridate as_datetime
 #' @export
-editableDT=function(input,output,session,data,length=50,cols=1:7,status="default",showButtons=TRUE,enableSave=TRUE, editable=NULL,...){
+editableDT=function(input,output,session,data,length=50,cols=1:7,status="default",showButtons=TRUE,enableSave=TRUE, editable=NULL,formatList=NULL,...){
 
      ns <- session$ns
 
@@ -256,16 +257,23 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,status="default
      output$table <- renderDT({
           if(!is.null(shortdata())){
 
+
           if(input$simpleColNames){
-              datatable(shortdata(),
+              table=datatable(shortdata(),
                         editable=RV$editable,
                         colnames=paste0("col",1:ncol(shortdata())),
                         options=list(pageLength=10),...)
           } else{
-              datatable(shortdata(),
-                    editable=RV$editable,
-                    options=list(pageLength=10),...)
+              table=datatable(shortdata(),
+                    editable=RV$editable, options=list(pageLength=10),...)
           }
+              if(is.null(formatList)){
+                  table
+              } else{
+                  formatList$table=table
+                  formatList$columns=1:ncol(shortdata())
+                  do.call(formatStyle,formatList)
+              }
           }
      })
 

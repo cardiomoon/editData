@@ -15,6 +15,7 @@ editableDT(
   showButtons = TRUE,
   enableSave = TRUE,
   editable = NULL,
+  formatList = NULL,
   ...
 )
 }
@@ -38,6 +39,8 @@ editableDT(
 \item{enableSave}{logical}
 
 \item{editable}{logical}
+
+\item{formatList}{Null or list. Format list to be passed to formatStyle}
 
 \item{...}{Further arguments to be passed to datatable()}
 }
