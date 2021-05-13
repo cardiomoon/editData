@@ -4,7 +4,7 @@ author: "Keon-Woong Moon"
 date: "2021-4-2"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{editData}
+  %\VignetteIndexEntry{package editData : An RStudio Addin for Editing A 'data.frame'}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

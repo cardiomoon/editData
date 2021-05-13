@@ -340,7 +340,12 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,status="default
                   rownames(newdf)[i]=v
               }
           } else{
-             newdf[i,j]<-DT::coerceValue(v, newdf[i, j])
+              if("POSIXct" %in% class(newdf[i,j])){
+                  newdf[i,j]<-lubridate::as_datetime(v)
+              } else{
+                  newdf[i,j]<-DT::coerceValue(v, newdf[i, j])
+              }
+             # newdf[i,j]<-DT::coerceValue(v, newdf[i, j])
           }
           df1(newdf)
           replaceData(proxy,df1(),resetPaging=FALSE)
@@ -351,7 +356,12 @@ editableDT=function(input,output,session,data,length=50,cols=1:7,status="default
              rownames(newdf2)[i]=v
               }
           } else{
-             newdf2[i,j]<-DT::coerceValue(v, newdf2[i, j])
+              if("POSIXct" %in% class(newdf[i,j])){
+                  newdf2[i,j]<-lubridate::as_datetime(v)
+              } else{
+                  newdf2[i,j]<-DT::coerceValue(v, newdf2[i, j])
+              }
+             # newdf2[i,j]<-DT::coerceValue(v, newdf2[i, j])
 
           }
           finalDf(newdf2)
