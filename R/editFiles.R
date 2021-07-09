@@ -13,6 +13,18 @@ file2ext=function(filename){
      return(tolower(result))
 }
 
+#'read csv file
+#' @param file A character string naming a file
+#' @param ... Further arguments to be passed to read.csv
+#' @export
+myimport_csv=function(file,...){
+        data1=read.csv(file,...)
+        result<-tryCatch(max(sapply(data1,nchar),na.rm=TRUE),error = function(e) "error")
+        if(!is.numeric(result)) {
+                data1=read.csv(file,fileEncoding="euc-kr",...)
+        }
+        data1
+}
 
 #' Read in a data.frame from a file
 #' @param file A character string naming a file
@@ -23,10 +35,7 @@ file2ext=function(filename){
 myimport=function(file,...){
      ext=file2ext(file)
      if(ext=="csv"){
-          result<-tryCatch(read.csv(file,stringsAsFactors = FALSE),error=function(c) "error")
-          if(class(result)!="data.frame"){
-               result<-tryCatch(read.csv(file,stringsAsFactors = FALSE,fileEncoding = "euc-kr"),error=function(c) "error")
-          }
+          result<-myimport_csv(file)
      } else{
           result=rio::import(file,...)
      }
