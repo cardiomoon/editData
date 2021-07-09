@@ -15,7 +15,7 @@ pickerInput3=function (...)
 #' maxLength(month.name)
 maxLength=function(x){
     if(is.character(x)){
-        max(nchar(x),na.rm=TRUE)
+        max(nchar(x,type="bytes"),na.rm=TRUE)
     } else{
         1
     }
@@ -28,7 +28,7 @@ maxLength=function(x){
 makeShort=function(x,length=50){
     if(is.character(x)){
         if(length(grep("<a href",x))==0){
-        select<-nchar(x,keepNA=FALSE)>length
+        select<-nchar(x,type="bytes",keepNA=FALSE)>length
         select
         x[select]<-paste0(substr(x[select],1,length),"...")
         }
