@@ -18,7 +18,9 @@ file2ext=function(filename){
 #' @param ... Further arguments to be passed to read.csv
 #' @export
 myimport_csv=function(file,...){
-        data1=read.csv(file,...)
+
+        data1<-tryCatch(read.csv(file,...),error = function(e) "error")
+        if(class(data1)=="character") data1<-tryCatch(read.csv(file,fileEncoding="euc-kr",...),error = function(e) "error")
         result<-tryCatch(max(sapply(data1,nchar),na.rm=TRUE),error = function(e) "error")
         if(!is.numeric(result)) {
                 data1=read.csv(file,fileEncoding="euc-kr",...)
